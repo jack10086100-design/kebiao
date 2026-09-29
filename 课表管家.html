@@ -1,0 +1,3461 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>课表管家 · 2023级临床核心课程F组</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei','Noto Sans CJK SC',sans-serif;background:#eef2f7;color:#1f2937;line-height:1.5;-webkit-tap-highlight-color:transparent}
+.app{max-width:680px;margin:0 auto;padding:14px 14px 60px}
+header{background:linear-gradient(135deg,#2f6fed,#5b8def);color:#fff;border-radius:16px;padding:18px 18px 14px;margin-bottom:12px;box-shadow:0 4px 12px rgba(47,111,237,.25)}
+.brand{font-size:20px;font-weight:700;display:flex;align-items:center;gap:8px}
+.sub{font-size:12px;opacity:.92;margin-top:5px}
+.panel{background:#fff;border-radius:14px;padding:12px;margin-bottom:12px;box-shadow:0 1px 4px rgba(15,23,42,.06)}
+.row{display:flex;gap:8px;margin-bottom:8px;align-items:center}
+.row:last-child{margin-bottom:0}
+input[type=text],input[type=date],select{flex:1;min-width:0;padding:10px 12px;border:1px solid #d7dde8;border-radius:10px;font-size:14px;background:#f8fafc;color:#1f2937;outline:none}
+input[type=text]:focus,input[type=date]:focus,select:focus{border-color:#2f6fed}
+button{padding:9px 13px;border:none;border-radius:10px;background:#eef2f8;color:#334155;font-size:13px;cursor:pointer;transition:background .15s}
+button:hover{background:#e2e8f2}
+button.primary{background:#2f6fed;color:#fff;font-weight:600}
+button.primary:hover{background:#2560d8}
+button.danger{background:#fee2e2;color:#b91c1c}
+button.ok{background:#dcfce7;color:#15803d}
+button.sm{padding:5px 9px;font-size:12px;border-radius:8px}
+.tabs{display:flex;gap:6px;padding:6px;background:#f1f5fa;border-radius:12px}
+.tab{flex:1;text-align:center;padding:9px 0;border-radius:9px;background:transparent;color:#64748b;font-size:14px}
+.tab.active{background:#2f6fed;color:#fff;font-weight:600}
+.result-info{margin:4px 2px 10px;font-size:13px;color:#475569;line-height:1.7}
+.day-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.day-title{font-size:16px;font-weight:700;flex:1}
+.navbtn{padding:6px 10px;font-size:12px}
+.card{background:#fff;border:1px solid #e6ebf3;border-radius:12px;padding:12px;margin-bottom:10px;box-shadow:0 1px 3px rgba(15,23,42,.05)}
+.card.cancelled{opacity:.6;background:#fafbfc}
+.card .top{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+.time-chip{background:#eef4ff;color:#2f6fed;font-weight:700;font-size:13px;padding:3px 8px;border-radius:7px;font-variant-numeric:tabular-nums}
+.period-chip{background:#f1f5fa;color:#64748b;font-size:12px;padding:3px 7px;border-radius:7px}
+.badge{font-size:11px;padding:3px 8px;border-radius:20px;font-weight:600}
+.t-理论课{background:#e0f2fe;color:#0369a1}
+.t-见习{background:#dcfce7;color:#15803d}
+.t-CBL{background:#ffedd5;color:#c2410c}
+.t-讨论课{background:#f3e8ff;color:#7e22ce}
+.t-PBL{background:#fef9c3;color:#a16207}
+.t-床边教学,.t-床旁教学{background:#ccfbf1;color:#0f766e}
+.t-案例教学{background:#ffe4e6;color:#be123c}
+.t-考试{background:#fee2e2;color:#b91c1c}
+.t-其他{background:#f1f5f9;color:#64748b}
+.t-调课{background:#f1f5f9;color:#94a3b8}
+.badge.s-正常{background:#dcfce7;color:#15803d}
+.badge.s-已修改{background:#ffedd5;color:#c2410c}
+.badge.s-已取消{background:#fee2e2;color:#b91c1c}
+.badge.s-用户补充{background:#ede9fe;color:#6d28d9}
+.course-name{font-size:16px;font-weight:700;margin-bottom:5px}
+.course-name .strike{text-decoration:line-through;color:#94a3b8}
+.meta{font-size:13px;color:#475569;margin-bottom:4px}
+.meta .lbl{color:#94a3b8}
+.content{font-size:13px;color:#64748b;margin-bottom:8px;background:#f8fafc;border-radius:8px;padding:7px 9px}
+.content.empty{color:#94a3b8;font-style:italic}
+.card-actions{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap}
+.free-block{background:#ecfdf5;color:#047857;font-size:13px;border-radius:8px;padding:7px 9px;margin-top:8px}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat-box{background:#f8fafc;border:1px solid #e6ebf3;border-radius:10px;padding:10px}
+.stat-box .k{font-size:12px;color:#94a3b8}
+.stat-box .v{font-size:15px;font-weight:700;color:#1f2937;margin-top:3px}
+.week-day{border:1px solid #e6ebf3;border-radius:12px;margin-bottom:10px;overflow:hidden}
+.week-day .wd-head{display:flex;align-items:center;gap:8px;padding:9px 12px;background:#f8fafc;border-bottom:1px solid #e6ebf3;cursor:pointer}
+.week-day .wd-head .d{font-weight:700;font-size:14px}
+.week-day .wd-head .cnt{font-size:12px;color:#94a3b8;margin-left:auto}
+.wd-body{padding:8px 10px}
+.wd-item{font-size:13px;padding:4px 0;border-bottom:1px dashed #eef2f7;display:flex;gap:6px;align-items:baseline}
+.wd-item:last-child{border-bottom:none}
+.wd-item .t{color:#2f6fed;font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums}
+.wd-item .c{color:#1f2937}
+.wd-item .badge{flex-shrink:0}
+.wd-empty{color:#c3ccd9;font-size:13px;padding:6px 0}
+.wd-today .wd-head{background:#eef4ff}
+.modal{position:fixed;inset:0;background:rgba(15,23,42,.5);display:none;align-items:center;justify-content:center;z-index:50;padding:16px}
+.modal.open{display:flex}
+.modal-box{background:#fff;border-radius:16px;max-width:540px;width:100%;padding:16px;max-height:88vh;overflow:auto}
+.modal-title{font-size:16px;font-weight:700;margin-bottom:12px}
+.field{margin-bottom:10px}
+.field label{display:block;font-size:12px;color:#64748b;margin-bottom:4px}
+.field input,.field select,.field textarea{width:100%;padding:9px 11px;border:1px solid #d7dde8;border-radius:9px;font-size:14px;background:#f8fafc}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+.conflict-box{background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:10px;margin:10px 0;font-size:13px;color:#b91c1c}
+.hint{font-size:12px;color:#94a3b8;margin-top:6px}
+.hide{display:none}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand">📅 课表管家</div>
+    <div class="sub">2023级临床核心课程F组 · 学期课表 2026-08-31 ~ 2026-12-25（W0~W16）</div>
+  </header>
+
+  <section class="panel">
+    <div class="row">
+      <input type="text" id="q" placeholder="试试：明天 / 9月28日 / 周三 / 第5周周三 / 儿科 / A301">
+      <button class="primary" id="qBtn">查询</button>
+    </div>
+    <div class="row">
+      <button id="btnToday">今天</button>
+      <button id="btnTomorrow">明天</button>
+      <button id="btnWeek">本周</button>
+      <input type="date" id="dateInput">
+    </div>
+    <div class="hint">支持：今天/明天/后天/昨天 · X月X日 · 周X/这周X/下周一 · 周末 · 第N周周三 · 上午/下午 · 课程/教室/教师关键词</div>
+  </section>
+
+  <div id="resultInfo" class="result-info"></div>
+
+  <section class="panel tabs">
+    <button class="tab active" data-tab="day">当日课表</button>
+    <button class="tab" data-tab="week">整周课表</button>
+    <button class="tab" data-tab="add">补充安排</button>
+    <button class="tab" data-tab="stats">本周统计</button>
+  </section>
+
+  <main id="main"></main>
+</div>
+
+<div class="modal" id="modal"><div class="modal-box" id="modalBox"></div></div>
+
+<script>
+const BASE_DATA = {
+ "meta": {
+  "title": "2023级临床核心课程F组课表",
+  "sheet": "逐日课表",
+  "generated": "2026-09-23 15:42"
+ },
+ "records": [
+  {
+   "id": 1,
+   "week": "W0",
+   "date": "2026-08-31",
+   "weekday": "周一",
+   "period": "1-2节",
+   "time": "08:00-09:40",
+   "course": "外科学",
+   "type": "理论课",
+   "content": "概论，无菌术，围手术期处理",
+   "teacher": "叶进军 主任医师",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 2,
+   "week": "W0",
+   "date": "2026-08-31",
+   "weekday": "周一",
+   "period": "3-4节",
+   "time": "10:00-11:40",
+   "course": "儿科学",
+   "type": "理论课",
+   "content": "新生儿窒息、HIE",
+   "teacher": "黄循斌 主任医师",
+   "location": "101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 3,
+   "week": "W0",
+   "date": "2026-08-31",
+   "weekday": "周一",
+   "period": "8-9节",
+   "time": "16:00-17:40",
+   "course": "内科学（1）",
+   "type": "理论课",
+   "content": "呼吸衰竭",
+   "teacher": "申严",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 4,
+   "week": "W0",
+   "date": "2026-09-01",
+   "weekday": "周二",
+   "period": "1-2节",
+   "time": "08:00-09:40",
+   "course": "儿科学",
+   "type": "理论课",
+   "content": "新生儿黄疸",
+   "teacher": "曾淑娟 主任医师",
+   "location": "101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 5,
+   "week": "W0",
+   "date": "2026-09-01",
+   "weekday": "周二",
+   "period": "3-4节",
+   "time": "10:00-11:40",
+   "course": "传染病学",
+   "type": "理论课",
+   "content": "病毒性肝炎",
+   "teacher": "瞿志军 主任医师",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 6,
+   "week": "W0",
+   "date": "2026-09-01",
+   "weekday": "周二",
+   "period": "6-7节",
+   "time": "14:00-15:40",
+   "course": "眼科学",
+   "type": "理论课",
+   "content": "眼科学基础与防盲治盲",
+   "teacher": "李娟 副主任医师",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 7,
+   "week": "W0",
+   "date": "2026-09-02",
+   "weekday": "周三",
+   "period": "1-2节",
+   "time": "08:00-09:40",
+   "course": "外科学",
+   "type": "理论课",
+   "content": "输血，外科病人的代谢及营养治疗",
+   "teacher": "魏九峰 副主任医师",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 8,
+   "week": "W0",
+   "date": "2026-09-02",
+   "weekday": "周三",
+   "period": "3-4节",
+   "time": "10:00-11:40",
+   "course": "妇产科学",
+   "type": "理论课",
+   "content": "绪论、女性生殖系统解剖",
+   "teacher": "曾艳花",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 9,
+   "week": "W0",
+   "date": "2026-09-02",
+   "weekday": "周三",
+   "period": "6-7节",
+   "time": "14:00-15:40",
+   "course": "内科学（1）",
+   "type": "理论课",
+   "content": "呼吸衰竭",
+   "teacher": "申严",
+   "location": "12栋102教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 10,
+   "week": "W0",
+   "date": "2026-09-03",
+   "weekday": "周四",
+   "period": "1-2节",
+   "time": "08:00-09:40",
+   "course": "传染病学",
+   "type": "理论课",
+   "content": "肠道传染病（伤寒、痢疾）",
+   "teacher": "邝建玉 副主任医师",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 11,
+   "week": "W0",
+   "date": "2026-09-03",
+   "weekday": "周四",
+   "period": "3-4节",
+   "time": "10:00-11:40",
+   "course": "内科学（1）",
+   "type": "理论课",
+   "content": "支气管哮喘",
+   "teacher": "李娜",
+   "location": "12栋103教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 12,
+   "week": "W0",
+   "date": "2026-09-03",
+   "weekday": "周四",
+   "period": "6-7节",
+   "time": "14:00-15:40",
+   "course": "耳鼻喉科学",
+   "type": "理论课",
+   "content": "鼻的应用解剖及生理、鼻部炎症性疾病、鼻中隔偏曲",
+   "teacher": "马玲",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 13,
+   "week": "W0",
+   "date": "2026-09-03",
+   "weekday": "周四",
+   "period": "8-9节",
+   "time": "16:00-17:40",
+   "course": "口腔科学",
+   "type": "理论课",
+   "content": "口腔颌面部解剖生理（8节）；口腔颌面部检查（9节）",
+   "teacher": "洪煜锐 主任医师；万林子 主治医师",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 14,
+   "week": "W0",
+   "date": "2026-09-04",
+   "weekday": "周五",
+   "period": "1-2节",
+   "time": "08:00-09:40",
+   "course": "妇产科学",
+   "type": "理论课",
+   "content": "妇产科专科检查：产检、妇检",
+   "teacher": "赵新科",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 15,
+   "week": "W0",
+   "date": "2026-09-04",
+   "weekday": "周五",
+   "period": "3-4节",
+   "time": "10:00-11:40",
+   "course": "皮肤性病学",
+   "type": "理论课",
+   "content": "皮肤的解剖、组织和生理；皮肤病的病因、症状、诊断",
+   "teacher": "党林",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 16,
+   "week": "W0",
+   "date": "2026-09-04",
+   "weekday": "周五",
+   "period": "6-7节",
+   "time": "14:00-15:40",
+   "course": "儿科学",
+   "type": "理论课",
+   "content": "循环总论、先心病",
+   "teacher": "黄循斌 主任医师",
+   "location": "101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 17,
+   "week": "W0",
+   "date": "2026-09-04",
+   "weekday": "周五",
+   "period": "8-9节",
+   "time": "16:00-17:40",
+   "course": "外科学",
+   "type": "理论课",
+   "content": "创伤、外科休克",
+   "teacher": "刘继东 副主任医师",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 18,
+   "week": "W1",
+   "date": "2026-09-07",
+   "weekday": "周一",
+   "period": "1-2节",
+   "time": "08:00-09:40",
+   "course": "外科学",
+   "type": "理论课",
+   "content": "麻醉",
+   "teacher": "雷洪伊 主任医师",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 19,
+   "week": "W1",
+   "date": "2026-09-07",
+   "weekday": "周一",
+   "period": "3-4节",
+   "time": "10:00-11:40",
+   "course": "儿科学",
+   "type": "理论课",
+   "content": "先心病",
+   "teacher": "黄循斌 主任医师",
+   "location": "101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 20,
+   "week": "W1",
+   "date": "2026-09-07",
+   "weekday": "周一",
+   "period": "8-9节",
+   "time": "16:00-17:40",
+   "course": "内科学（1）",
+   "type": "理论课",
+   "content": "心脏瓣膜病",
+   "teacher": "钟庆华",
+   "location": "12栋104教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 21,
+   "week": "W1",
+   "date": "2026-09-08",
+   "weekday": "周二",
+   "period": "1-2节",
+   "time": "08:00-09:40",
+   "course": "儿科学",
+   "type": "理论课",
+   "content": "消化系统总论、腹泻病",
+   "teacher": "吴伟 主任医师",
+   "location": "101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 22,
+   "week": "W1",
+   "date": "2026-09-08",
+   "weekday": "周二",
+   "period": "3-4节",
+   "time": "10:00-11:40",
+   "course": "传染病学",
+   "type": "理论课",
+   "content": "感染性休克、恙虫病、疟疾、布鲁菌病",
+   "teacher": "莫金英 副主任医师",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 23,
+   "week": "W1",
+   "date": "2026-09-08",
+   "weekday": "周二",
+   "period": "6-7节",
+   "time": "14:00-15:40",
+   "course": "眼科学",
+   "type": "理论课",
+   "content": "结膜病，角膜病，眼表疾病",
+   "teacher": "许志波 主治医师",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 24,
+   "week": "W1",
+   "date": "2026-09-09",
+   "weekday": "周三",
+   "period": "1-2节",
+   "time": "08:00-09:40",
+   "course": "外科学",
+   "type": "理论课",
+   "content": "麻醉、疼痛治疗",
+   "teacher": "雷洪伊 主任医师",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 25,
+   "week": "W1",
+   "date": "2026-09-09",
+   "weekday": "周三",
+   "period": "3-4节",
+   "time": "10:00-11:40",
+   "course": "妇产科学",
+   "type": "理论课",
+   "content": "女性生殖系统生理",
+   "teacher": "林向容",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 26,
+   "week": "W1",
+   "date": "2026-09-09",
+   "weekday": "周三",
+   "period": "6-7节",
+   "time": "14:00-15:40",
+   "course": "内科学（1）",
+   "type": "理论课",
+   "content": "缺血性心脏病",
+   "teacher": "方胜先",
+   "location": "12栋105教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 27,
+   "week": "W1",
+   "date": "2026-09-09",
+   "weekday": "周三",
+   "period": "8-9节",
+   "time": "16:00-17:40",
+   "course": "皮肤性病学",
+   "type": "理论课",
+   "content": "浅部真菌病、病毒性皮肤病",
+   "teacher": "刘付华",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 28,
+   "week": "W1",
+   "date": "2026-09-10",
+   "weekday": "周四",
+   "period": "1-2节",
+   "time": "08:00-09:40",
+   "course": "传染病学",
+   "type": "理论课",
+   "content": "发热伴血小板减少综合征（流行性出血热、登革热等）",
+   "teacher": "邝建玉 副主任医师",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 29,
+   "week": "W1",
+   "date": "2026-09-10",
+   "weekday": "周四",
+   "period": "3-4节",
+   "time": "10:00-11:40",
+   "course": "内科学（1）",
+   "type": "理论课",
+   "content": "缺血性心脏病",
+   "teacher": "方胜先",
+   "location": "12栋106教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 30,
+   "week": "W1",
+   "date": "2026-09-10",
+   "weekday": "周四",
+   "period": "6-7节",
+   "time": "14:00-15:40",
+   "course": "耳鼻喉科学",
+   "type": "理论课",
+   "content": "鼻出血、鼻-前颅底肿瘤",
+   "teacher": "李胜",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 31,
+   "week": "W1",
+   "date": "2026-09-10",
+   "weekday": "周四",
+   "period": "8-9节",
+   "time": "16:00-17:40",
+   "course": "口腔科学",
+   "type": "理论课",
+   "content": "牙体牙髓病",
+   "teacher": "宋芳 主治医师",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 32,
+   "week": "W1",
+   "date": "2026-09-11",
+   "weekday": "周五",
+   "period": "1-2节",
+   "time": "08:00-09:40",
+   "course": "妇产科学",
+   "type": "理论课",
+   "content": "妊娠生理",
+   "teacher": "林向容",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 33,
+   "week": "W1",
+   "date": "2026-09-11",
+   "weekday": "周五",
+   "period": "3-4节",
+   "time": "10:00-11:40",
+   "course": "儿科学",
+   "type": "理论课",
+   "content": "新生儿呼吸窘迫综合征（6节）；结核总论（7节）",
+   "teacher": "黄循斌 主任医师",
+   "location": "101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 34,
+   "week": "W1",
+   "date": "2026-09-11",
+   "weekday": "周五",
+   "period": "6-7节",
+   "time": "14:00-15:40",
+   "course": "皮肤性病学",
+   "type": "理论课",
+   "content": "银屑病、痤疮、脂溢性皮炎",
+   "teacher": "唐妮",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 35,
+   "week": "W1",
+   "date": "2026-09-11",
+   "weekday": "周五",
+   "period": "8-9节",
+   "time": "16:00-17:40",
+   "course": "外科学",
+   "type": "理论课",
+   "content": "烧伤",
+   "teacher": "何穆 副主任医师",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 36,
+   "week": "W2",
+   "date": "2026-09-14",
+   "weekday": "周一",
+   "period": "1-2节",
+   "time": "08:00-09:40",
+   "course": "开学动员会",
+   "type": "其他",
+   "content": "开学动员会",
+   "teacher": "—",
+   "location": "—",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 37,
+   "week": "W2",
+   "date": "2026-09-14",
+   "weekday": "周一",
+   "period": "8-9节",
+   "time": "16:00-17:40",
+   "course": "外科学",
+   "type": "理论课",
+   "content": "外科感染",
+   "teacher": "辛乐 副主任医师",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 38,
+   "week": "W2",
+   "date": "2026-09-15",
+   "weekday": "周二",
+   "period": "1-2节",
+   "time": "08:00-09:40",
+   "course": "儿科学",
+   "type": "理论课",
+   "content": "呼吸总论、上感、哮喘",
+   "teacher": "王自财 主任医师",
+   "location": "101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 39,
+   "week": "W2",
+   "date": "2026-09-15",
+   "weekday": "周二",
+   "period": "3-4节",
+   "time": "10:00-11:40",
+   "course": "传染病学",
+   "type": "理论课",
+   "content": "艾滋病、新发传染性疾病",
+   "teacher": "赵蔚 副主任医师",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 40,
+   "week": "W2",
+   "date": "2026-09-15",
+   "weekday": "周二",
+   "period": "6-7节",
+   "time": "14:00-15:40",
+   "course": "眼科学",
+   "type": "理论课",
+   "content": "眼睑病、泪器病、眼眶病、全身性疾病的眼部表现",
+   "teacher": "蔡玉莲 副主任医师",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 41,
+   "week": "W2",
+   "date": "2026-09-15",
+   "weekday": "周二",
+   "period": "8-9节",
+   "time": "16:00-17:40",
+   "course": "耳鼻喉科学",
+   "type": "理论课",
+   "content": "咽喉解剖及生理、慢性扁桃体炎、腺样体肥大、OSAHS",
+   "teacher": "龙汉杰",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 42,
+   "week": "W2",
+   "date": "2026-09-16",
+   "weekday": "周三",
+   "period": "1-2节",
+   "time": "08:00-09:40",
+   "course": "外科学",
+   "type": "理论课",
+   "content": "移植、外科微创技术",
+   "teacher": "邓汪东 主任医师",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 43,
+   "week": "W2",
+   "date": "2026-09-16",
+   "weekday": "周三",
+   "period": "3-4节",
+   "time": "10:00-11:40",
+   "course": "妇产科学",
+   "type": "理论课",
+   "content": "妇产科常见临床症状和病史采集",
+   "teacher": "赵新科",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 44,
+   "week": "W2",
+   "date": "2026-09-16",
+   "weekday": "周三",
+   "period": "6-7节",
+   "time": "14:00-15:40",
+   "course": "内科学（1）",
+   "type": "理论课",
+   "content": "高血压",
+   "teacher": "朱剑",
+   "location": "12栋107教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 45,
+   "week": "W2",
+   "date": "2026-09-16",
+   "weekday": "周三",
+   "period": "8-9节",
+   "time": "16:00-17:40",
+   "course": "皮肤性病学",
+   "type": "理论课",
+   "content": "药疹、荨麻疹",
+   "teacher": "唐妮",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 46,
+   "week": "W2",
+   "date": "2026-09-17",
+   "weekday": "周四",
+   "period": "1-2节",
+   "time": "08:00-09:40",
+   "course": "儿科学",
+   "type": "理论课",
+   "content": "肺炎",
+   "teacher": "王自财 主任医师",
+   "location": "101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 47,
+   "week": "W2",
+   "date": "2026-09-17",
+   "weekday": "周四",
+   "period": "3-4节",
+   "time": "10:00-11:40",
+   "course": "内科学（1）",
+   "type": "理论课",
+   "content": "心肌疾病+心包炎",
+   "teacher": "洪雷",
+   "location": "12栋108教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 48,
+   "week": "W2",
+   "date": "2026-09-17",
+   "weekday": "周四",
+   "period": "6-7节",
+   "time": "14:00-15:40",
+   "course": "耳鼻喉科学",
+   "type": "理论课",
+   "content": "咽喉部肿瘤、喉麻痹、喉梗阻",
+   "teacher": "张俊伟",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 49,
+   "week": "W2",
+   "date": "2026-09-17",
+   "weekday": "周四",
+   "period": "8-9节",
+   "time": "16:00-17:40",
+   "course": "口腔科学",
+   "type": "理论课",
+   "content": "牙周病（8节）；口腔局部麻醉（9节）",
+   "teacher": "林臻彦 副主任医师",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 50,
+   "week": "W2",
+   "date": "2026-09-18",
+   "weekday": "周五",
+   "period": "1-2节",
+   "time": "08:00-09:40",
+   "course": "妇产科学",
+   "type": "理论课",
+   "content": "妊娠诊断、胎心监护",
+   "teacher": "李玉芳",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 51,
+   "week": "W2",
+   "date": "2026-09-18",
+   "weekday": "周五",
+   "period": "3-4节",
+   "time": "10:00-11:40",
+   "course": "皮肤性病学",
+   "type": "理论课",
+   "content": "结缔组织病",
+   "teacher": "党林",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 52,
+   "week": "W2",
+   "date": "2026-09-18",
+   "weekday": "周五",
+   "period": "8-9节",
+   "time": "16:00-17:40",
+   "course": "外科学",
+   "type": "理论课",
+   "content": "颈部疾病",
+   "teacher": "孙昊 副主任医师",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 53,
+   "week": "W2",
+   "date": "2026-09-19",
+   "weekday": "周六",
+   "period": "6-7节",
+   "time": "14:00-15:40",
+   "course": "基础综合考",
+   "type": "考试",
+   "content": "基础综合考核",
+   "teacher": "—",
+   "location": "—",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 54,
+   "week": "W3",
+   "date": "2026-09-21",
+   "weekday": "周一",
+   "period": "上午",
+   "time": "08:00-12:00",
+   "course": "儿科学",
+   "type": "见习",
+   "content": "儿科/新生儿科见习（1-2节8:00-9:30）；病史采集、体检CBL（3-4节10:00-11:30）",
+   "teacher": "住院部老师；周秋婧",
+   "location": "儿科/新生儿科；儿科示教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 55,
+   "week": "W3",
+   "date": "2026-09-21",
+   "weekday": "周一",
+   "period": "8-9节",
+   "time": "16:00-17:40",
+   "course": "外科学",
+   "type": "理论课",
+   "content": "乳房疾病",
+   "teacher": "林宝行 副主任医师",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 56,
+   "week": "W3",
+   "date": "2026-09-22",
+   "weekday": "周二",
+   "period": "上午",
+   "time": "08:00-12:00",
+   "course": "儿科学",
+   "type": "见习",
+   "content": "儿科/新生儿科见习（1-2节）；血液系统（贫血）CBL（3-4节）",
+   "teacher": "住院部老师；史林东",
+   "location": "儿科/新生儿科；儿科示教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 57,
+   "week": "W3",
+   "date": "2026-09-22",
+   "weekday": "周二",
+   "period": "6-7节",
+   "time": "14:00-15:40",
+   "course": "眼科学",
+   "type": "理论课",
+   "content": "晶状体病，葡萄膜病",
+   "teacher": "邓江涛 主治医师",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 58,
+   "week": "W3",
+   "date": "2026-09-22",
+   "weekday": "周二",
+   "period": "8-9节",
+   "time": "16:00-17:40",
+   "course": "外科学",
+   "type": "理论课",
+   "content": "胸部损伤，胸壁、胸膜疾病，原发性纵隔肿瘤，肺部疾病",
+   "teacher": "麻成方 副主治医师",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 59,
+   "week": "W3",
+   "date": "2026-09-23",
+   "weekday": "周三",
+   "period": "上午",
+   "time": "09:00-11:15",
+   "course": "儿科学",
+   "type": "见习",
+   "content": "呼吸系统疾病CBL（2-4节）",
+   "teacher": "郭凯平",
+   "location": "儿科示教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 60,
+   "week": "W3",
+   "date": "2026-09-23",
+   "weekday": "周三",
+   "period": "8-9节",
+   "time": "16:00-17:40",
+   "course": "皮肤性病学",
+   "type": "理论课",
+   "content": "性传播性疾病",
+   "teacher": "李云会",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 61,
+   "week": "W3",
+   "date": "2026-09-24",
+   "weekday": "周四",
+   "period": "上午",
+   "time": "08:00-12:00",
+   "course": "儿科学",
+   "type": "见习",
+   "content": "儿科/新生儿科见习（1-2节）；教学病例讨论（黄疸）CBL（3-4节）",
+   "teacher": "住院部老师；史林东",
+   "location": "儿科/新生儿科；儿科示教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 62,
+   "week": "W3",
+   "date": "2026-09-24",
+   "weekday": "周四",
+   "period": "6-7节",
+   "time": "14:00-15:40",
+   "course": "耳鼻喉科学",
+   "type": "理论课",
+   "content": "气管食管解剖及生理、气道异物、食道异物、颈部疾病学",
+   "teacher": "张俊伟",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 63,
+   "week": "W3",
+   "date": "2026-09-24",
+   "weekday": "周四",
+   "period": "8-9节",
+   "time": "16:00-17:40",
+   "course": "口腔科学",
+   "type": "理论课",
+   "content": "口腔颌面部损伤",
+   "teacher": "万林子 主治医师",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 64,
+   "week": "W4",
+   "date": "2026-09-28",
+   "weekday": "周一",
+   "period": "上午",
+   "time": "08:00-10:15",
+   "course": "儿科学",
+   "type": "见习",
+   "content": "儿科门诊/儿保见习（1-3节）",
+   "teacher": "门诊、儿保老师",
+   "location": "儿科门诊、儿保",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 65,
+   "week": "W4",
+   "date": "2026-09-28",
+   "weekday": "周一",
+   "period": "8-9节",
+   "time": "16:00-17:40",
+   "course": "中医学基础",
+   "type": "理论课",
+   "content": "导论",
+   "teacher": "邓郡",
+   "location": "综合楼101",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 66,
+   "week": "W4",
+   "date": "2026-09-29",
+   "weekday": "周二",
+   "period": "上午",
+   "time": "08:00-10:15",
+   "course": "儿科学",
+   "type": "见习",
+   "content": "儿科门诊/儿保见习（1-3节）",
+   "teacher": "门诊、儿保老师",
+   "location": "儿科门诊、儿保",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 67,
+   "week": "W4",
+   "date": "2026-09-29",
+   "weekday": "周二",
+   "period": "6-7节",
+   "time": "14:00-15:40",
+   "course": "眼科学",
+   "type": "理论课",
+   "content": "眼视光学，眼外肌病，弱视",
+   "teacher": "程芳 主治医师",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 68,
+   "week": "W4",
+   "date": "2026-09-29",
+   "weekday": "周二",
+   "period": "8-9节",
+   "time": "16:00-17:40",
+   "course": "外科学",
+   "type": "理论课",
+   "content": "心脏疾病",
+   "teacher": "李志华 副主任医师",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 69,
+   "week": "W4",
+   "date": "2026-09-30",
+   "weekday": "周三",
+   "period": "上午",
+   "time": "09:00-11:15",
+   "course": "儿科学",
+   "type": "见习",
+   "content": "消化、营养性疾病（小讲课，2-4节）",
+   "teacher": "黄循斌",
+   "location": "儿科示教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 70,
+   "week": "W4",
+   "date": "2026-09-30",
+   "weekday": "周三",
+   "period": "8-9节",
+   "time": "16:00-17:40",
+   "course": "儿科学",
+   "type": "理论课",
+   "content": "化脓性脑膜炎",
+   "teacher": "伍全概 副主任医师",
+   "location": "101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 71,
+   "week": "W5",
+   "date": "2026-10-08",
+   "weekday": "周四",
+   "period": "上午",
+   "time": "08:00-12:00",
+   "course": "儿科学",
+   "type": "见习",
+   "content": "儿科/新生儿科见习（1-2节）；泌尿系统（肾病）CBL（3-4节）",
+   "teacher": "住院部老师；吴伟",
+   "location": "儿科/新生儿科；儿科示教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 72,
+   "week": "W5",
+   "date": "2026-10-08",
+   "weekday": "周四",
+   "period": "6-7节",
+   "time": "14:00-15:40",
+   "course": "耳鼻喉科学",
+   "type": "理论课",
+   "content": "耳部解剖及生理、耳部炎症性疾病",
+   "teacher": "张俊伟",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 73,
+   "week": "W5",
+   "date": "2026-10-08",
+   "weekday": "周四",
+   "period": "8-9节",
+   "time": "16:00-17:40",
+   "course": "口腔科学",
+   "type": "理论课",
+   "content": "牙拔除术（8节）；口腔黏膜常见病（9节）",
+   "teacher": "万林子 主治医师；付文华 主治医师",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 74,
+   "week": "W5",
+   "date": "2026-10-09",
+   "weekday": "周五",
+   "period": "上午",
+   "time": "08:00-12:00",
+   "course": "儿科学",
+   "type": "见习",
+   "content": "儿科/新生儿科见习（1-2节）；教学病例讨论（发热、抽搐）CBL（3-4节）",
+   "teacher": "住院部老师；刘婷",
+   "location": "儿科/新生儿科；儿科示教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 75,
+   "week": "W5",
+   "date": "2026-10-09",
+   "weekday": "周五",
+   "period": "6-7节",
+   "time": "14:00-15:40",
+   "course": "中医学基础",
+   "type": "理论课",
+   "content": "阴阳、五行学说",
+   "teacher": "邓郡",
+   "location": "综合楼101",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 76,
+   "week": "W5",
+   "date": "2026-10-09",
+   "weekday": "周五",
+   "period": "8-9节",
+   "time": "16:00-17:40",
+   "course": "口腔科学",
+   "type": "理论课",
+   "content": "唾液腺常见病（8节）；颞下颌关节常见病（9节）",
+   "teacher": "付文华 主治医师",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 77,
+   "week": "W5",
+   "date": "2026-10-10",
+   "weekday": "周六",
+   "period": "上午",
+   "time": "09:00-11:15",
+   "course": "儿科学",
+   "type": "见习",
+   "content": "液体疗法CBL（2-4节）",
+   "teacher": "刘婷",
+   "location": "儿科示教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 78,
+   "week": "W5",
+   "date": "2026-10-10",
+   "weekday": "周六",
+   "period": "6-7节",
+   "time": "14:00-15:40",
+   "course": "临床思维训练",
+   "type": "讨论课",
+   "content": "临床思维总论（六组合班）",
+   "teacher": "孙俊生",
+   "location": "12-101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 79,
+   "week": "W5",
+   "date": "2026-10-10",
+   "weekday": "周六",
+   "period": "8-9节",
+   "time": "16:00-17:40",
+   "course": "眼科学",
+   "type": "理论课",
+   "content": "青光眼，眼外伤",
+   "teacher": "颜坚 主任医师",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 80,
+   "week": "W6",
+   "date": "2026-10-12",
+   "weekday": "周一",
+   "period": "上午",
+   "time": "09:00-11:15",
+   "course": "儿科学",
+   "type": "见习",
+   "content": "病历讲评TBL（2-4节）",
+   "teacher": "黄循斌",
+   "location": "儿科示教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 81,
+   "week": "W6",
+   "date": "2026-10-12",
+   "weekday": "周一",
+   "period": "8-9节",
+   "time": "16:00-17:40",
+   "course": "中医学基础",
+   "type": "理论课",
+   "content": "藏象学说-概述、五脏",
+   "teacher": "邓郡",
+   "location": "综合楼101",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 82,
+   "week": "W6",
+   "date": "2026-10-13",
+   "weekday": "周二",
+   "period": "上午",
+   "time": "08:00-10:15",
+   "course": "儿科学",
+   "type": "见习",
+   "content": "儿科/新生儿科见习（1-3节）",
+   "teacher": "住院部老师",
+   "location": "儿科/新生儿科",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 83,
+   "week": "W6",
+   "date": "2026-10-13",
+   "weekday": "周二",
+   "period": "6-7节",
+   "time": "14:00-15:40",
+   "course": "眼科学",
+   "type": "理论课",
+   "content": "视网膜，玻璃体，视路病",
+   "teacher": "颜坚 主任医师",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 84,
+   "week": "W6",
+   "date": "2026-10-14",
+   "weekday": "周三",
+   "period": "上午",
+   "time": "08:00-12:00",
+   "course": "口腔科学",
+   "type": "见习",
+   "content": "口腔常见病治疗过程",
+   "teacher": "宋芳",
+   "location": "健康服务楼6楼",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 85,
+   "week": "W6",
+   "date": "2026-10-14",
+   "weekday": "周三",
+   "period": "8-9节",
+   "time": "16:00-17:40",
+   "course": "外科学",
+   "type": "理论课",
+   "content": "腹外疝",
+   "teacher": "刘继东 副主任医师",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 86,
+   "week": "W6",
+   "date": "2026-10-15",
+   "weekday": "周四",
+   "period": "上午",
+   "time": "08:00-11:00",
+   "course": "口腔科学",
+   "type": "见习",
+   "content": "口腔常见病治疗过程",
+   "teacher": "宋芳",
+   "location": "健康服务楼6楼",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 87,
+   "week": "W6",
+   "date": "2026-10-15",
+   "weekday": "周四",
+   "period": "6-7节",
+   "time": "14:00-15:40",
+   "course": "耳鼻喉科学",
+   "type": "理论课",
+   "content": "耳聋及其防治、眩晕、面神经疾病",
+   "teacher": "张俊伟",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 88,
+   "week": "W6",
+   "date": "2026-10-15",
+   "weekday": "周四",
+   "period": "8-9节",
+   "time": "16:00-17:40",
+   "course": "口腔科学",
+   "type": "理论课",
+   "content": "口腔颌面部感染（8节）；口腔颌面部肿瘤（9节）",
+   "teacher": "邬腊梅 主治医师",
+   "location": "12栋101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 89,
+   "week": "W6",
+   "date": "2026-10-16",
+   "weekday": "周五",
+   "period": "6-7节",
+   "time": "14:00-15:40",
+   "course": "中医学基础",
+   "type": "理论课",
+   "content": "藏象学说-六腑、奇恒之腑",
+   "teacher": "邓郡",
+   "location": "综合楼101",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 90,
+   "week": "W6",
+   "date": "2026-10-16",
+   "weekday": "周五",
+   "period": "8-9节",
+   "time": "16:00-17:40",
+   "course": "临床思维训练",
+   "type": "讨论课",
+   "content": "腹痛的临床诊断（DEF组）",
+   "teacher": "姚丁烨",
+   "location": "12-101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 91,
+   "week": "W7",
+   "date": "2026-10-19",
+   "weekday": "周一",
+   "period": "上午",
+   "time": "08:00-12:00",
+   "course": "妇产科学",
+   "type": "见习",
+   "content": "住院病房床边见习（1-4节）",
+   "teacher": "住院部医生",
+   "location": "妇科/产科病房",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 92,
+   "week": "W7",
+   "date": "2026-10-19",
+   "weekday": "周一",
+   "period": "8-9节",
+   "time": "16:00-17:40",
+   "course": "中医学基础",
+   "type": "理论课",
+   "content": "藏象学说-脏腑关系",
+   "teacher": "邓郡",
+   "location": "综合楼101",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 93,
+   "week": "W7",
+   "date": "2026-10-20",
+   "weekday": "周二",
+   "period": "上午",
+   "time": "08:00-12:00",
+   "course": "妇产科学",
+   "type": "见习",
+   "content": "住院病房床边见习（1-4节）",
+   "teacher": "住院部医生",
+   "location": "妇科/产科病房",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 94,
+   "week": "W7",
+   "date": "2026-10-20",
+   "weekday": "周二",
+   "period": "6-7节",
+   "time": "14:00-15:40",
+   "course": "妇产科学",
+   "type": "CBL",
+   "content": "计划生育相关知识",
+   "teacher": "邹燕红 主治医师",
+   "location": "妇科示教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 95,
+   "week": "W7",
+   "date": "2026-10-21",
+   "weekday": "周三",
+   "period": "上午",
+   "time": "08:00-12:00",
+   "course": "妇产科学",
+   "type": "见习",
+   "content": "住院病房床边见习（1-4节）",
+   "teacher": "住院部医生",
+   "location": "妇科/产科病房",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 96,
+   "week": "W7",
+   "date": "2026-10-21",
+   "weekday": "周三",
+   "period": "6-7节",
+   "time": "14:00-15:40",
+   "course": "妇产科学",
+   "type": "CBL",
+   "content": "不孕症",
+   "teacher": "张婉璐 主治医师",
+   "location": "妇科示教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 97,
+   "week": "W7",
+   "date": "2026-10-22",
+   "weekday": "周四",
+   "period": "上午",
+   "time": "08:00-12:00",
+   "course": "妇产科学",
+   "type": "见习",
+   "content": "住院病房床边见习（1-4节）",
+   "teacher": "住院部医生",
+   "location": "妇科/产科病房",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 98,
+   "week": "W7",
+   "date": "2026-10-22",
+   "weekday": "周四",
+   "period": "6-7节",
+   "time": "14:00-15:40",
+   "course": "妇产科学",
+   "type": "CBL",
+   "content": "女性生殖系统炎症",
+   "teacher": "谢晓彬 副主任医师",
+   "location": "妇科示教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 99,
+   "week": "W7",
+   "date": "2026-10-23",
+   "weekday": "周五",
+   "period": "上午",
+   "time": "08:00-12:00",
+   "course": "妇产科学",
+   "type": "见习",
+   "content": "住院病房床边见习（1-2节）；子宫内膜异位症CBL（3-4节）",
+   "teacher": "住院部医生；张冬梅 主治医师",
+   "location": "妇科/产科病房；妇科示教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 100,
+   "week": "W7",
+   "date": "2026-10-23",
+   "weekday": "周五",
+   "period": "6-7节",
+   "time": "14:00-15:40",
+   "course": "中医学基础",
+   "type": "理论课",
+   "content": "精、气、血、津液、神",
+   "teacher": "邓郡",
+   "location": "综合楼101",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 101,
+   "week": "W7",
+   "date": "2026-10-23",
+   "weekday": "周五",
+   "period": "8-9节",
+   "time": "16:00-17:40",
+   "course": "临床思维训练",
+   "type": "讨论课",
+   "content": "白带异常（DEF组）",
+   "teacher": "邓翠雯",
+   "location": "12-101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 102,
+   "week": "W8",
+   "date": "2026-10-26",
+   "weekday": "周一",
+   "period": "上午",
+   "time": "08:00-12:00",
+   "course": "妇产科学",
+   "type": "见习",
+   "content": "住院病房床边见习（1-4节）",
+   "teacher": "住院部医生",
+   "location": "妇科/产科病房",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 103,
+   "week": "W8",
+   "date": "2026-10-26",
+   "weekday": "周一",
+   "period": "8-9节",
+   "time": "16:00-17:40",
+   "course": "中医学基础",
+   "type": "理论课",
+   "content": "病因病机",
+   "teacher": "邓郡",
+   "location": "综合楼101",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 104,
+   "week": "W8",
+   "date": "2026-10-27",
+   "weekday": "周二",
+   "period": "上午",
+   "time": "08:00-12:00",
+   "course": "妇产科学",
+   "type": "见习",
+   "content": "住院病房床边见习（1-4节）",
+   "teacher": "住院部医生",
+   "location": "妇科/产科病房",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 105,
+   "week": "W8",
+   "date": "2026-10-28",
+   "weekday": "周三",
+   "period": "上午",
+   "time": "08:00-12:00",
+   "course": "妇产科学",
+   "type": "见习",
+   "content": "住院病房床边见习（1-4节）",
+   "teacher": "住院部医生",
+   "location": "妇科/产科病房",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 106,
+   "week": "W8",
+   "date": "2026-10-28",
+   "weekday": "周三",
+   "period": "6-7节",
+   "time": "14:00-15:40",
+   "course": "妇产科学",
+   "type": "CBL",
+   "content": "子宫颈肿瘤",
+   "teacher": "邬春霞 副主任医师",
+   "location": "妇科示教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 107,
+   "week": "W8",
+   "date": "2026-10-29",
+   "weekday": "周四",
+   "period": "上午",
+   "time": "08:00-11:40",
+   "course": "妇产科学",
+   "type": "CBL",
+   "content": "异常妊娠（流产、异位妊娠）（2-3节）",
+   "teacher": "苏娇娇 主治医师",
+   "location": "妇科示教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 108,
+   "week": "W8",
+   "date": "2026-10-30",
+   "weekday": "周五",
+   "period": "6-7节",
+   "time": "14:00-15:40",
+   "course": "中医学基础",
+   "type": "理论课",
+   "content": "四诊-望诊、闻诊",
+   "teacher": "范曼琪",
+   "location": "综合楼101",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 109,
+   "week": "W8",
+   "date": "2026-10-30",
+   "weekday": "周五",
+   "period": "8-9节",
+   "time": "16:00-17:40",
+   "course": "临床思维训练",
+   "type": "讨论课",
+   "content": "呼吸困难的诊断与鉴别诊断（DEF组）",
+   "teacher": "孙俊生",
+   "location": "12-101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 110,
+   "week": "W9",
+   "date": "2026-11-02",
+   "weekday": "周一",
+   "period": "上午",
+   "time": "08:00-12:00",
+   "course": "内科学（1）",
+   "type": "床边教学",
+   "content": "心内科见习+心律失常",
+   "teacher": "张伟明 主治医师/洪雷 副主任医师",
+   "location": "内儿科楼10楼示教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 111,
+   "week": "W9",
+   "date": "2026-11-02",
+   "weekday": "周一",
+   "period": "8-9节",
+   "time": "16:00-17:40",
+   "course": "中医学基础",
+   "type": "理论课",
+   "content": "四诊-问诊、切诊",
+   "teacher": "范曼琪",
+   "location": "综合楼101",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 112,
+   "week": "W9",
+   "date": "2026-11-03",
+   "weekday": "周二",
+   "period": "上午",
+   "time": "08:00-12:00",
+   "course": "内科学（1）",
+   "type": "床边教学",
+   "content": "心内科见习+心力衰竭",
+   "teacher": "王晓昱 医师/洪雷 副主任医师",
+   "location": "内儿科楼10楼示教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 113,
+   "week": "W9",
+   "date": "2026-11-03",
+   "weekday": "周二",
+   "period": "下午",
+   "time": "14:30-17:30",
+   "course": "内科学（1）",
+   "type": "床边教学",
+   "content": "心内科见习+高血压",
+   "teacher": "赖剑鸣 主治医师/洪雷 副主任医师",
+   "location": "内儿科楼10楼示教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 114,
+   "week": "W9",
+   "date": "2026-11-04",
+   "weekday": "周三",
+   "period": "上午",
+   "time": "08:00-12:00",
+   "course": "内科学（1）",
+   "type": "床边教学",
+   "content": "冠心病PBL1",
+   "teacher": "洪雷 副主任医师/黄晓东 主治医师",
+   "location": "内儿科楼10楼示教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 115,
+   "week": "W9",
+   "date": "2026-11-04",
+   "weekday": "周三",
+   "period": "下午",
+   "time": "14:30-17:30",
+   "course": "内科学（1）",
+   "type": "床边教学",
+   "content": "冠心病PBL2",
+   "teacher": "洪雷 副主任医师/张伟明 主治医师",
+   "location": "内儿科楼10楼示教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 116,
+   "week": "W9",
+   "date": "2026-11-05",
+   "weekday": "周四",
+   "period": "上午",
+   "time": "08:00-12:00",
+   "course": "内科学（1）",
+   "type": "床边教学",
+   "content": "心内科见习+心血管疾病的介入诊疗",
+   "teacher": "徐贤 主治医师/洪雷 副主任医师",
+   "location": "内儿科楼10楼示教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 117,
+   "week": "W9",
+   "date": "2026-11-05",
+   "weekday": "周四",
+   "period": "下午",
+   "time": "14:30-17:30",
+   "course": "内科学（1）",
+   "type": "床边教学",
+   "content": "心内科见习+心脏瓣膜病",
+   "teacher": "黄晓东 主治医师/洪雷 副主任医师",
+   "location": "内儿科楼10楼示教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 118,
+   "week": "W9",
+   "date": "2026-11-06",
+   "weekday": "周五",
+   "period": "上午",
+   "time": "08:00-12:00",
+   "course": "内科学（1）",
+   "type": "床边教学",
+   "content": "心内科见习+心脏电复律",
+   "teacher": "洪雷 副主任医师/徐贤 主治医师",
+   "location": "内儿科楼10楼示教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 119,
+   "week": "W9",
+   "date": "2026-11-06",
+   "weekday": "周五",
+   "period": "6-7节",
+   "time": "14:00-15:40",
+   "course": "中医学基础",
+   "type": "理论课",
+   "content": "八纲辨证",
+   "teacher": "范曼琪",
+   "location": "综合楼101",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 120,
+   "week": "W9",
+   "date": "2026-11-06",
+   "weekday": "周五",
+   "period": "8-9节",
+   "time": "16:00-17:40",
+   "course": "临床思维训练",
+   "type": "讨论课",
+   "content": "慢加急性肝衰竭诊治（DEF组）",
+   "teacher": "黄振华",
+   "location": "12-101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 121,
+   "week": "W10",
+   "date": "2026-11-09",
+   "weekday": "周一",
+   "period": "上午",
+   "time": "08:00-12:00",
+   "course": "内科学（1）",
+   "type": "床边教学",
+   "content": "心内科见习+心肌疾病",
+   "teacher": "洪雷 副主任医师/王晓昱 医师",
+   "location": "内儿科楼10楼示教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 122,
+   "week": "W10",
+   "date": "2026-11-09",
+   "weekday": "周一",
+   "period": "8-9节",
+   "time": "16:00-17:40",
+   "course": "中医学基础",
+   "type": "理论课",
+   "content": "脏腑辨证",
+   "teacher": "范曼琪",
+   "location": "综合楼101",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 123,
+   "week": "W10",
+   "date": "2026-11-10",
+   "weekday": "周二",
+   "period": "上午",
+   "time": "08:00-12:00",
+   "course": "内科学（1）",
+   "type": "床边教学",
+   "content": "心内科见习+感染性心内膜炎",
+   "teacher": "洪雷 副主任医师/赖剑鸣 主治医师",
+   "location": "内儿科楼10楼示教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 124,
+   "week": "W10",
+   "date": "2026-11-11",
+   "weekday": "周三",
+   "period": "上午",
+   "time": "08:00-12:00",
+   "course": "内科学（1）",
+   "type": "床边教学",
+   "content": "呼吸科见习+呼吸衰竭",
+   "teacher": "丘国清、赖育庭",
+   "location": "内儿科楼9楼示教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 125,
+   "week": "W10",
+   "date": "2026-11-11",
+   "weekday": "周三",
+   "period": "下午",
+   "time": "14:30-17:30",
+   "course": "内科学（1）",
+   "type": "床边教学",
+   "content": "呼吸科见习+肺结核",
+   "teacher": "赖育庭、柳元斌",
+   "location": "内儿科楼9楼示教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 126,
+   "week": "W10",
+   "date": "2026-11-12",
+   "weekday": "周四",
+   "period": "上午",
+   "time": "08:00-12:00",
+   "course": "内科学（1）",
+   "type": "床边教学",
+   "content": "呼吸科见习+哮喘",
+   "teacher": "丘国清、徐香琴",
+   "location": "内儿科楼9楼示教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 127,
+   "week": "W10",
+   "date": "2026-11-12",
+   "weekday": "周四",
+   "period": "下午",
+   "time": "14:30-17:30",
+   "course": "内科学（1）",
+   "type": "床边教学",
+   "content": "呼吸科见习+肺癌",
+   "teacher": "柳元斌、徐香琴",
+   "location": "内儿科楼9楼示教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 128,
+   "week": "W10",
+   "date": "2026-11-13",
+   "weekday": "周五",
+   "period": "上午",
+   "time": "08:00-12:00",
+   "course": "内科学（1）",
+   "type": "床边教学",
+   "content": "呼吸科见习+慢性阻塞性肺疾病",
+   "teacher": "赖育庭、丘国清",
+   "location": "内儿科楼9楼示教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 129,
+   "week": "W10",
+   "date": "2026-11-13",
+   "weekday": "周五",
+   "period": "6-7节",
+   "time": "14:00-15:40",
+   "course": "中医学基础",
+   "type": "理论课",
+   "content": "防治原则",
+   "teacher": "范曼琪",
+   "location": "综合楼101",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 130,
+   "week": "W10",
+   "date": "2026-11-13",
+   "weekday": "周五",
+   "period": "8-9节",
+   "time": "16:00-17:40",
+   "course": "临床思维训练",
+   "type": "讨论课",
+   "content": "胸痛的临床诊断思维（DEF组）",
+   "teacher": "孙俊生",
+   "location": "12-101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 131,
+   "week": "W11",
+   "date": "2026-11-16",
+   "weekday": "周一",
+   "period": "上午",
+   "time": "08:00-12:00",
+   "course": "内科学（1）",
+   "type": "床边教学",
+   "content": "呼吸科见习+肺炎",
+   "teacher": "陈思达、柳元斌",
+   "location": "内儿科楼9楼示教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 132,
+   "week": "W11",
+   "date": "2026-11-16",
+   "weekday": "周一",
+   "period": "8-9节",
+   "time": "16:00-17:40",
+   "course": "中医学基础",
+   "type": "理论课",
+   "content": "方药总论",
+   "teacher": "刘美琪",
+   "location": "综合楼101",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 133,
+   "week": "W11",
+   "date": "2026-11-17",
+   "weekday": "周二",
+   "period": "上午",
+   "time": "08:00-12:00",
+   "course": "内科学（1）",
+   "type": "床边教学",
+   "content": "呼吸科见习+胸膜炎",
+   "teacher": "徐香琴、柳元斌",
+   "location": "内儿科楼9楼示教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 134,
+   "week": "W11",
+   "date": "2026-11-17",
+   "weekday": "周二",
+   "period": "下午",
+   "time": "14:30-17:30",
+   "course": "内科学（1）",
+   "type": "床边教学",
+   "content": "呼吸科见习+肺心病",
+   "teacher": "赖育庭、陈思达",
+   "location": "内儿科楼9楼示教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 135,
+   "week": "W11",
+   "date": "2026-11-18",
+   "weekday": "周三",
+   "period": "上午",
+   "time": "08:00-11:40",
+   "course": "耳鼻喉科学",
+   "type": "见习",
+   "content": "耳鼻喉一般检查（1-4节）",
+   "teacher": "张俊伟",
+   "location": "6号楼7楼耳鼻喉门诊DSD",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 136,
+   "week": "W11",
+   "date": "2026-11-18",
+   "weekday": "周三",
+   "period": "下午",
+   "time": "14:00-17:40",
+   "course": "耳鼻喉科学",
+   "type": "见习",
+   "content": "耳科常见病诊疗（6-9节）",
+   "teacher": "张俊伟",
+   "location": "6号楼7楼耳鼻喉门诊DSD",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 137,
+   "week": "W11",
+   "date": "2026-11-19",
+   "weekday": "周四",
+   "period": "上午",
+   "time": "08:00-11:40",
+   "course": "耳鼻喉科学",
+   "type": "见习",
+   "content": "鼻科常见病诊疗（1-4节）",
+   "teacher": "张俊伟",
+   "location": "6号楼7楼耳鼻喉门诊DSD",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 138,
+   "week": "W11",
+   "date": "2026-11-19",
+   "weekday": "周四",
+   "period": "下午",
+   "time": "14:00-17:40",
+   "course": "耳鼻喉科学",
+   "type": "见习",
+   "content": "咽喉常见病诊疗及其他（6-9节）",
+   "teacher": "张俊伟",
+   "location": "6号楼7楼耳鼻喉门诊DSD",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 139,
+   "week": "W11",
+   "date": "2026-11-20",
+   "weekday": "周五",
+   "period": "6-7节",
+   "time": "14:00-15:40",
+   "course": "中医学基础",
+   "type": "理论课",
+   "content": "解表方药",
+   "teacher": "刘美琪",
+   "location": "综合楼101",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 140,
+   "week": "W11",
+   "date": "2026-11-20",
+   "weekday": "周五",
+   "period": "8-9节",
+   "time": "16:00-17:40",
+   "course": "临床思维训练",
+   "type": "讨论课",
+   "content": "咯血的诊断思路（DEF组）",
+   "teacher": "姚丁烨",
+   "location": "12-101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 141,
+   "week": "W12",
+   "date": "2026-11-23",
+   "weekday": "周一",
+   "period": "上午",
+   "time": "08:00-11:00",
+   "course": "外科学",
+   "type": "见习",
+   "content": "胸外科见习",
+   "teacher": "罗益胜 主治医师",
+   "location": "胸外科",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 142,
+   "week": "W12",
+   "date": "2026-11-23",
+   "weekday": "周一",
+   "period": "8-9节",
+   "time": "16:00-17:40",
+   "course": "中医学基础",
+   "type": "理论课",
+   "content": "清热方药",
+   "teacher": "刘美琪",
+   "location": "综合楼101",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 143,
+   "week": "W12",
+   "date": "2026-11-24",
+   "weekday": "周二",
+   "period": "上午",
+   "time": "08:00-11:00",
+   "course": "外科学",
+   "type": "见习",
+   "content": "甲状腺乳腺外科见习",
+   "teacher": "袁梓膳 主治医师",
+   "location": "甲状腺乳腺外科",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 144,
+   "week": "W12",
+   "date": "2026-11-24",
+   "weekday": "周二",
+   "period": "下午",
+   "time": "14:30-17:30",
+   "course": "外科学",
+   "type": "案例教学",
+   "content": "乳房疾病",
+   "teacher": "袁梓膳 主治医师",
+   "location": "甲状腺乳腺外科",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 145,
+   "week": "W12",
+   "date": "2026-11-25",
+   "weekday": "周三",
+   "period": "上午",
+   "time": "08:00-11:00",
+   "course": "外科学",
+   "type": "见习",
+   "content": "胸外科见习",
+   "teacher": "罗益胜 主治医师",
+   "location": "胸外科",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 146,
+   "week": "W12",
+   "date": "2026-11-25",
+   "weekday": "周三",
+   "period": "下午",
+   "time": "14:30-17:30",
+   "course": "外科学",
+   "type": "案例教学",
+   "content": "颈部疾病",
+   "teacher": "孙昊 副主任医师",
+   "location": "甲状腺乳腺外科",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 147,
+   "week": "W12",
+   "date": "2026-11-26",
+   "weekday": "周四",
+   "period": "上午",
+   "time": "08:00-11:00",
+   "course": "外科学",
+   "type": "见习",
+   "content": "疝与腹壁外科见习",
+   "teacher": "辛乐 副主任医师",
+   "location": "普外科",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 148,
+   "week": "W12",
+   "date": "2026-11-26",
+   "weekday": "周四",
+   "period": "下午",
+   "time": "14:30-17:30",
+   "course": "外科学",
+   "type": "见习",
+   "content": "甲状腺乳腺外科见习",
+   "teacher": "袁梓膳 主治医师",
+   "location": "甲状腺乳腺外科",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 149,
+   "week": "W12",
+   "date": "2026-11-27",
+   "weekday": "周五",
+   "period": "上午",
+   "time": "08:00-11:00",
+   "course": "外科学",
+   "type": "案例教学",
+   "content": "胸部损伤、胸壁、胸膜疾病",
+   "teacher": "麻成方 副主任医师",
+   "location": "胸外科",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 150,
+   "week": "W12",
+   "date": "2026-11-27",
+   "weekday": "周五",
+   "period": "6-7节",
+   "time": "14:00-15:40",
+   "course": "中医学基础",
+   "type": "理论课",
+   "content": "祛痰止咳平喘药",
+   "teacher": "刘美琪",
+   "location": "综合楼101",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 151,
+   "week": "W12",
+   "date": "2026-11-27",
+   "weekday": "周五",
+   "period": "8-9节",
+   "time": "16:00-17:40",
+   "course": "临床思维训练",
+   "type": "讨论课",
+   "content": "新生儿黄疸（DEF组）",
+   "teacher": "邓翠雯",
+   "location": "12-101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 152,
+   "week": "W13",
+   "date": "2026-11-30",
+   "weekday": "周一",
+   "period": "上午",
+   "time": "08:00-11:00",
+   "course": "外科学",
+   "type": "见习",
+   "content": "整形外科见习",
+   "teacher": "肖东兴 主治医师",
+   "location": "整形外科",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 153,
+   "week": "W13",
+   "date": "2026-11-30",
+   "weekday": "周一",
+   "period": "8-9节",
+   "time": "16:00-17:40",
+   "course": "中医学基础",
+   "type": "理论课",
+   "content": "理气方药",
+   "teacher": "刘美琪",
+   "location": "综合楼101",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 154,
+   "week": "W13",
+   "date": "2026-12-01",
+   "weekday": "周二",
+   "period": "上午",
+   "time": "08:00-11:00",
+   "course": "外科学",
+   "type": "见习",
+   "content": "烧伤科见习",
+   "teacher": "黄泳思 主治医师",
+   "location": "烧伤科",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 155,
+   "week": "W13",
+   "date": "2026-12-01",
+   "weekday": "周二",
+   "period": "下午",
+   "time": "14:30-17:30",
+   "course": "外科学",
+   "type": "案例教学",
+   "content": "肺癌",
+   "teacher": "麻成方 副主任医师",
+   "location": "胸外科",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 156,
+   "week": "W13",
+   "date": "2026-12-02",
+   "weekday": "周三",
+   "period": "上午",
+   "time": "08:00-11:00",
+   "course": "外科学",
+   "type": "见习",
+   "content": "重症医学科见习",
+   "teacher": "卓李圆 副主任医师",
+   "location": "重症医学科",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 157,
+   "week": "W13",
+   "date": "2026-12-02",
+   "weekday": "周三",
+   "period": "下午",
+   "time": "—",
+   "course": "外科学",
+   "type": "调课",
+   "content": "可安排调课（无课）",
+   "teacher": "—",
+   "location": "—",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 158,
+   "week": "W13",
+   "date": "2026-12-03",
+   "weekday": "周四",
+   "period": "上午",
+   "time": "08:00-11:00",
+   "course": "外科学",
+   "type": "案例教学",
+   "content": "腹外疝",
+   "teacher": "刘继东 副主任医师",
+   "location": "普外科",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 159,
+   "week": "W13",
+   "date": "2026-12-03",
+   "weekday": "周四",
+   "period": "下午",
+   "time": "—",
+   "course": "外科学",
+   "type": "调课",
+   "content": "可安排调课（无课）",
+   "teacher": "—",
+   "location": "—",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 160,
+   "week": "W13",
+   "date": "2026-12-04",
+   "weekday": "周五",
+   "period": "上午",
+   "time": "08:00-11:00",
+   "course": "外科学",
+   "type": "见习",
+   "content": "消化内镜室见习",
+   "teacher": "曾锻 副主任医师",
+   "location": "消化内镜室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 161,
+   "week": "W13",
+   "date": "2026-12-04",
+   "weekday": "周五",
+   "period": "6-7节",
+   "time": "14:00-15:40",
+   "course": "中医学基础",
+   "type": "理论课",
+   "content": "理血方药",
+   "teacher": "刘美琪",
+   "location": "综合楼101",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 162,
+   "week": "W13",
+   "date": "2026-12-04",
+   "weekday": "周五",
+   "period": "8-9节",
+   "time": "16:00-17:40",
+   "course": "临床思维训练",
+   "type": "讨论课",
+   "content": "眩晕的诊断思路（DEF组）",
+   "teacher": "胡波琳",
+   "location": "12-101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 163,
+   "week": "W14",
+   "date": "2026-12-07",
+   "weekday": "周一",
+   "period": "上午",
+   "time": "08:00-11:00",
+   "course": "外科学",
+   "type": "见习",
+   "content": "麻醉科见习",
+   "teacher": "杨雄眺 副主任医师",
+   "location": "麻醉科",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 164,
+   "week": "W14",
+   "date": "2026-12-07",
+   "weekday": "周一",
+   "period": "8-9节",
+   "time": "16:00-17:40",
+   "course": "中医学基础",
+   "type": "理论课",
+   "content": "补益方药",
+   "teacher": "刘美琪",
+   "location": "综合楼101",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 165,
+   "week": "W14",
+   "date": "2026-12-08",
+   "weekday": "周二",
+   "period": "上午",
+   "time": "08:00-11:00",
+   "course": "外科学",
+   "type": "案例教学",
+   "content": "食道疾病",
+   "teacher": "麻成方 副主任医师",
+   "location": "胸外科",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 166,
+   "week": "W14",
+   "date": "2026-12-09",
+   "weekday": "周三",
+   "period": "上午",
+   "time": "08:00-12:00",
+   "course": "皮肤性病学",
+   "type": "见习",
+   "content": "皮肤科常用外用药物的治疗原则和注意事项（小讲课1节）；常见皮肤病门诊见习（2-4节）",
+   "teacher": "郑朝晖；党林、刘付华、唐妮等",
+   "location": "示教室；皮肤科门诊",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 167,
+   "week": "W14",
+   "date": "2026-12-09",
+   "weekday": "周三",
+   "period": "下午",
+   "time": "14:00-15:40",
+   "course": "皮肤性病学",
+   "type": "PBL",
+   "content": "常见皮肤病（6-7节）",
+   "teacher": "刘付华",
+   "location": "示教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 168,
+   "week": "W14",
+   "date": "2026-12-10",
+   "weekday": "周四",
+   "period": "上午",
+   "time": "08:00-12:00",
+   "course": "皮肤性病学",
+   "type": "见习",
+   "content": "皮肤科门诊见习（主课表安排，具体以带教老师通知为准）",
+   "teacher": "—",
+   "location": "皮肤科门诊",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 169,
+   "week": "W14",
+   "date": "2026-12-11",
+   "weekday": "周五",
+   "period": "上午",
+   "time": "08:00-12:00",
+   "course": "皮肤性病学",
+   "type": "见习",
+   "content": "常见皮肤病门诊见习（1-4节）",
+   "teacher": "党林、刘付华、唐妮等",
+   "location": "皮肤科门诊",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 170,
+   "week": "W14",
+   "date": "2026-12-11",
+   "weekday": "周五",
+   "period": "6-7节",
+   "time": "14:00-15:40",
+   "course": "中医学基础",
+   "type": "理论课",
+   "content": "平肝息风药、安神药",
+   "teacher": "刘美琪",
+   "location": "综合楼101",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 171,
+   "week": "W14",
+   "date": "2026-12-11",
+   "weekday": "周五",
+   "period": "8-9节",
+   "time": "16:00-17:40",
+   "course": "临床思维训练",
+   "type": "讨论课",
+   "content": "小儿出血性疾病（DEF组）",
+   "teacher": "黄振华",
+   "location": "12-101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 172,
+   "week": "W15",
+   "date": "2026-12-14",
+   "weekday": "周一",
+   "period": "上午",
+   "time": "08:00-12:00",
+   "course": "中医学基础",
+   "type": "见习",
+   "content": "舌象分析",
+   "teacher": "范曼琪",
+   "location": "中医馆",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 173,
+   "week": "W15",
+   "date": "2026-12-14",
+   "weekday": "周一",
+   "period": "8-9节",
+   "time": "16:00-17:40",
+   "course": "中医学基础",
+   "type": "理论课",
+   "content": "经络",
+   "teacher": "綦雪巍",
+   "location": "综合楼101",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 174,
+   "week": "W15",
+   "date": "2026-12-15",
+   "weekday": "周二",
+   "period": "上午",
+   "time": "08:00-12:00",
+   "course": "中医学基础",
+   "type": "见习",
+   "content": "针刺法治疗技术",
+   "teacher": "邓郡",
+   "location": "中医馆",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 175,
+   "week": "W15",
+   "date": "2026-12-15",
+   "weekday": "周二",
+   "period": "下午",
+   "time": "14:30-17:30",
+   "course": "中医学基础",
+   "type": "见习",
+   "content": "拔罐治疗技术",
+   "teacher": "綦雪巍",
+   "location": "中医馆",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 176,
+   "week": "W15",
+   "date": "2026-12-16",
+   "weekday": "周三",
+   "period": "上午",
+   "time": "08:00-11:40",
+   "course": "眼科学",
+   "type": "见习",
+   "content": "PBL（8:00-9:40）；眼球解剖（模型）（10:00-11:40）",
+   "teacher": "黄洁",
+   "location": "门急诊楼11楼眼科病房示教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 177,
+   "week": "W15",
+   "date": "2026-12-16",
+   "weekday": "周三",
+   "period": "下午",
+   "time": "14:00-17:00",
+   "course": "眼科学",
+   "type": "见习",
+   "content": "眼科常用一般检查方法",
+   "teacher": "黄洁",
+   "location": "门急诊楼11楼眼科病房",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 178,
+   "week": "W15",
+   "date": "2026-12-17",
+   "weekday": "周四",
+   "period": "上午",
+   "time": "08:00-11:40",
+   "course": "眼科学",
+   "type": "见习",
+   "content": "眼科门诊见习",
+   "teacher": "黄洁",
+   "location": "健康服务楼5楼",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 179,
+   "week": "W15",
+   "date": "2026-12-17",
+   "weekday": "周四",
+   "period": "下午",
+   "time": "14:00-17:00",
+   "course": "眼科学",
+   "type": "见习",
+   "content": "眼科病房见习",
+   "teacher": "黄洁",
+   "location": "门急诊楼11楼眼科病房",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 180,
+   "week": "W15",
+   "date": "2026-12-18",
+   "weekday": "周五",
+   "period": "上午",
+   "time": "08:00-11:40",
+   "course": "眼科学",
+   "type": "见习",
+   "content": "眼科常用特殊检查方法（8:00-9:40）；PBL（10:00-11:40）",
+   "teacher": "黄洁",
+   "location": "健康服务楼5楼；门急诊楼11楼",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 181,
+   "week": "W15",
+   "date": "2026-12-18",
+   "weekday": "周五",
+   "period": "8-9节",
+   "time": "16:00-17:40",
+   "course": "临床思维训练",
+   "type": "讨论课",
+   "content": "肢体乏力的诊断思路（DEF组）",
+   "teacher": "胡波琳",
+   "location": "12-101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 182,
+   "week": "W16",
+   "date": "2026-12-23",
+   "weekday": "周三",
+   "period": "上午",
+   "time": "08:00-12:00",
+   "course": "传染病学",
+   "type": "床旁教学",
+   "content": "HIV、寄生虫感染",
+   "teacher": "赵蔚",
+   "location": "感染科",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 183,
+   "week": "W16",
+   "date": "2026-12-23",
+   "weekday": "周三",
+   "period": "下午",
+   "time": "14:30-17:30",
+   "course": "传染病学",
+   "type": "床旁教学",
+   "content": "感染性疾病",
+   "teacher": "莫金英",
+   "location": "感染科",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 184,
+   "week": "W16",
+   "date": "2026-12-24",
+   "weekday": "周四",
+   "period": "上午",
+   "time": "08:00-12:00",
+   "course": "传染病学",
+   "type": "床旁教学",
+   "content": "穿脱隔离衣、手卫生、隔离病房布局（穿脱隔离衣需考核）",
+   "teacher": "庄桂龙",
+   "location": "感染科",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 185,
+   "week": "W16",
+   "date": "2026-12-24",
+   "weekday": "周四",
+   "period": "下午",
+   "time": "14:30-17:30",
+   "course": "传染病学",
+   "type": "床旁教学",
+   "content": "病毒性肝炎",
+   "teacher": "邝建玉",
+   "location": "感染科",
+   "source": "学校原始课表",
+   "status": "正常"
+  },
+  {
+   "id": 186,
+   "week": "W16",
+   "date": "2026-12-25",
+   "weekday": "周五",
+   "period": "8-9节",
+   "time": "16:00-17:40",
+   "course": "临床思维训练",
+   "type": "讨论课",
+   "content": "腰背痛的诊断思路（DEF组）",
+   "teacher": "孙俊生",
+   "location": "12-101教室",
+   "source": "学校原始课表",
+   "status": "正常"
+  }
+ ]
+};
+const PRESET_MODS = [{"action": "cancel", "targetId": 64, "note": "放假后重新安排", "preset": true}, {"action": "cancel", "targetId": 65, "note": "放假后重新安排", "preset": true}, {"action": "cancel", "targetId": 66, "note": "放假后重新安排", "preset": true}, {"action": "cancel", "targetId": 67, "note": "放假后重新安排", "preset": true}, {"action": "cancel", "targetId": 68, "note": "放假后重新安排", "preset": true}, {"action": "cancel", "targetId": 69, "note": "放假后重新安排", "preset": true}, {"action": "cancel", "targetId": 70, "note": "放假后重新安排", "preset": true}];
+const STORAGE_KEY = 'kebiao_f_user_mods_v2';
+const WEEK_CN = ['日','一','二','三','四','五','六'];
+const W0_DATE = new Date(2026,7,31); // W0 周一 2026-08-31
+
+/* ---------- 基础工具 ---------- */
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function parseDateStr(s){const p=s.split('-').map(Number);return new Date(p[0],p[1]-1,p[2]);}
+function fmtDate(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function fmtCn(d){return d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日 星期'+WEEK_CN[d.getDay()];}
+function addDays(d,n){const r=new Date(d);r.setDate(r.getDate()+n);return r;}
+function weekMonday(d){const r=new Date(d.getFullYear(),d.getMonth(),d.getDate());r.setDate(r.getDate()-((r.getDay()+6)%7));return r;}
+function cn2idx(ch){return '一二三四五六日天'.indexOf(ch);}
+function parseTimeRange(t){
+  if(!t)return null;
+  const m=String(t).match(/(\d{1,2}):(\d{2})\s*[-–—~至]\s*(\d{1,2}):(\d{2})/);
+  if(!m)return null;
+  const s=(+m[1])*60+(+m[2]),e=(+m[3])*60+(+m[4]);
+  return e>s?[s,e]:null;
+}
+function startMin(r){const tr=parseTimeRange(r.time);return tr?tr[0]:9999;}
+function isFree(r){return r.type==='调课'&&(r.time==='—'||/无课|调课/.test(r.content||''));}
+function isActive(r){return r.status!=='已取消'&&!isFree(r);}
+
+/* ---------- 用户修改层 ---------- */
+function loadMods(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY))||[];}catch(e){return [];}}
+function saveMods(){localStorage.setItem(STORAGE_KEY,JSON.stringify(mods.filter(m=>!m.preset)));}
+let mods=[...PRESET_MODS, ...loadMods()];
+
+function effectiveRecords(){
+  const byId=new Map();
+  BASE_DATA.records.forEach(r=>byId.set(r.id,Object.assign({},r)));
+  mods.forEach(m=>{
+    if(m.action==='restore'){
+      const base=BASE_DATA.records.find(x=>x.id===m.targetId);
+      const r=byId.get(m.targetId);
+      if(r&&base){byId.set(m.targetId,Object.assign({},base));}
+    }else if(m.action==='cancel'){
+      const r=byId.get(m.targetId);
+      if(r){r.status='已取消';r.note=m.note||'';}
+    }else if(m.action==='edit'){
+      const r=byId.get(m.targetId);
+      if(r){Object.assign(r,m.fields);r.status='已修改';r.note=m.note||'';}
+    }else if(m.action==='add'){
+      byId.set(m.mid,Object.assign({},m.fields,{id:m.mid,source:'用户补充',status:'正常'}));
+    }
+  });
+  return Array.from(byId.values());
+}
+function getModsFor(id){return mods.filter(m=>m.targetId===id||m.mid===id);}
+
+/* ---------- 冲突检测 ---------- */
+function findConflicts(dateStr,startStr,endStr,excludeIds){
+  const range=parseTimeRange(startStr+'-'+endStr);
+  if(!range)return [];
+  const res=[];
+  effectiveRecords().forEach(r=>{
+    if(r.date!==dateStr||r.status==='已取消'||isFree(r))return;
+    if(excludeIds&&excludeIds.includes(r.id))return;
+    const tr=parseTimeRange(r.time);
+    if(tr&&tr[0]<range[1]&&range[0]<tr[1])res.push(r);
+  });
+  return res;
+}
+
+/* ---------- 状态 ---------- */
+const state={selDate:fmtDate(new Date()),part:null,keyword:null,weekMode:false,tab:'day',highlightFirst:false};
+
+/* ---------- 查询解析 ---------- */
+function resolveQuery(raw){
+  let s=String(raw||'').trim().replace(/\s+/g,'');
+  let part=null;
+  if(s.includes('上午')){part='am';s=s.replace(/上午/g,'');}
+  if(s.includes('下午')){part='pm';s=s.replace(/下午/g,'');}
+  const today=new Date(),monday=weekMonday(today);
+  let dates=null,highlightFirst=false;
+  const setOne=d=>dates=[fmtDate(d)];
+  if(/^今天/.test(s)){setOne(today);s=s.replace(/^今天/,'');}
+  else if(/^明天/.test(s)){setOne(addDays(today,1));s=s.replace(/^明天/,'');}
+  else if(/^后天/.test(s)){setOne(addDays(today,2));s=s.replace(/^后天/,'');}
+  else if(/^昨天/.test(s)){setOne(addDays(today,-1));s=s.replace(/^昨天/,'');}
+  else if(/^前天/.test(s)){setOne(addDays(today,-2));s=s.replace(/^前天/,'');}
+  else if(/周末/.test(s)){dates=[fmtDate(addDays(monday,5)),fmtDate(addDays(monday,6))];s=s.replace(/周末/g,'');}
+  else if(/^下下(周|星期)?([一二三四五六日天])/.test(s)){setOne(addDays(monday,14+cn2idx(RegExp.$2)));s=s.replace(/^下下(周|星期)?[一二三四五六日天]/,'');}
+  else if(/^下(周|星期)([一二三四五六日天])/.test(s)){setOne(addDays(monday,7+cn2idx(RegExp.$2)));s=s.replace(/^下(周|星期)[一二三四五六日天]/,'');}
+  else if(/^(这|本)(周|星期)([一二三四五六日天])/.test(s)){setOne(addDays(monday,cn2idx(RegExp.$3)));s=s.replace(/^(这|本)(周|星期)[一二三四五六日天]/,'');}
+  else if(/^(周|星期)([一二三四五六日天])/.test(s)){setOne(addDays(monday,cn2idx(RegExp.$2)));s=s.replace(/^(周|星期)[一二三四五六日天]/,'');}
+  else if(/^第(\d+)周(周|星期)?([一二三四五六日天])/.test(s)){
+    const wk=+RegExp.$1,wd=cn2idx(RegExp.$3);
+    setOne(addDays(W0_DATE,wk*7+wd));s=s.replace(/^第(\d+)周(周|星期)?[一二三四五六日天]/,'');
+  }
+  else if(/(20\d{2})年(\d{1,2})月(\d{1,2})[日号]?/.test(s)){setOne(new Date(+RegExp.$1,+RegExp.$2-1,+RegExp.$3));s=s.replace(/(20\d{2})年(\d{1,2})月(\d{1,2})[日号]?/,'');}
+  else if(/^(\d{1,2})月(\d{1,2})[日号]?/.test(s)){setOne(new Date(2026,+RegExp.$1-1,+RegExp.$2));s=s.replace(/^(\d{1,2})月(\d{1,2})[日号]?/,'');}
+  else if(/^(\d{1,2})[.\/](\d{1,2})$/.test(s)){setOne(new Date(2026,+RegExp.$1-1,+RegExp.$2));s='';}
+  else if(/^(这|本)周/.test(s)){dates=null;state.weekMode=true;s=s.replace(/^(这|本)周/,'');}
+  else if(/^下周/.test(s)){dates=null;state.weekMode=true;state.selDate=fmtDate(addDays(monday,7));s=s.replace(/^下周/,'');}
+  else if(/^上周/.test(s)){dates=null;state.weekMode=true;state.selDate=fmtDate(addDays(monday,-7));s=s.replace(/^上周/,'');}
+  else if(/^下下周/.test(s)){dates=null;state.weekMode=true;state.selDate=fmtDate(addDays(monday,14));s=s.replace(/^下下周/,'');}
+  if(/第一节|第一节课/.test(s)){highlightFirst=true;s=s.replace(/第一节|第一节课/g,'');}
+  const keyword=s||null;
+  return {dates,part,keyword,highlightFirst};
+}
+
+/* ---------- 渲染：当日 ---------- */
+function renderDay(dateStr,part,keyword,highlightFirst){
+  state.selDate=dateStr;state.part=part;state.keyword=keyword;state.highlightFirst=highlightFirst;
+  const d=parseDateStr(dateStr);
+  let recs=effectiveRecords().filter(r=>r.date===dateStr);
+  const freeSlots=recs.filter(isFree);
+  let active=recs.filter(isActive);
+  if(part==='am')active=active.filter(r=>{const tr=parseTimeRange(r.time);return tr&&tr[0]<720;});
+  if(part==='pm')active=active.filter(r=>{const tr=parseTimeRange(r.time);return tr&&tr[0]>=720;});
+  if(keyword){active=active.filter(r=>[r.course,r.location,r.teacher,r.content,r.type].join(' ').includes(keyword));}
+  active.sort((a,b)=>startMin(a)-startMin(b)||String(a.id).localeCompare(String(b.id)));
+  const cancelled=recs.filter(r=>r.status==='已取消');
+  const other=recs.filter(r=>isFree(r));
+
+  let html='<div class="day-head">'
+    +'<button class="navbtn" onclick="dayNav(-1)">‹ 前一天</button>'
+    +'<div class="day-title">'+fmtCn(d)+'</div>'
+    +'<button class="navbtn" onclick="dayNav(1)">后一天 ›</button></div>';
+
+  if(active.length===0&&cancelled.length===0&&other.length===0){
+    html+='<div class="card"><div class="course-name">当天没有安排课程。</div></div>';
+  }else{
+    if(active.length===0&&part){html+='<div class="card"><div class="course-name">该时段没有安排课程。</div></div>';}
+    active.forEach((r,i)=>{
+      if(highlightFirst&&i===0)html+='<div class="card" style="border-color:#2f6fed;box-shadow:0 0 0 2px rgba(47,111,237,.25)">';
+      else html+='<div class="card'+(r.status==='已修改'?'':'')+'">';
+      html+=renderCard(r);html+='</div>';
+    });
+    cancelled.forEach(r=>{html+='<div class="card cancelled">'+renderCard(r)+'</div>';});
+    other.forEach(r=>{html+='<div class="card cancelled">'+renderCard(r)+'</div>';});
+  }
+
+  // 当日统计
+  const stats=dayStats(active,cancelled);
+  html+='<div class="stats-grid">'
+    +'<div class="stat-box"><div class="k">共 '+stats.count+' 节</div><div class="v">'+stats.am+' 上午 · '+stats.pm+' 下午</div></div>'
+    +'<div class="stat-box"><div class="k">第一节课</div><div class="v">'+(stats.first||'无')+'</div></div>'
+    +'<div class="stat-box"><div class="k">最晚下课</div><div class="v">'+(stats.lastEnd||'无')+'</div></div>'
+    +'<div class="stat-box"><div class="k">已取消</div><div class="v">'+stats.cancelled+' 节</div></div>'
+    +'</div>';
+  if(stats.gaps.length){
+    html+='<div class="free-block">🕒 空闲时段：'+stats.gaps.map(g=>g[0]+'-'+g[1]).join('、')+'</div>';
+  }
+  document.getElementById('main').innerHTML=html;
+  document.getElementById('dateInput').value=dateStr;
+  const info='📅 '+fmtCn(d)+'';
+  document.getElementById('resultInfo').textContent=info;
+}
+function renderCard(r){
+  let badges='';
+  if(r.type)badges+='<span class="badge t-'+esc(r.type)+'">'+esc(r.type)+'</span>';
+  if(r.status==='已取消')badges+='<span class="badge s-已取消">已取消</span>';
+  else if(r.status==='已修改')badges+='<span class="badge s-已修改">已修改</span>';
+  if(r.source==='用户补充')badges+='<span class="badge s-用户补充">用户补充</span>';
+  const name=r.status==='已取消'?'<span class="strike">'+esc(r.course)+'</span>':esc(r.course);
+  let content=r.content?esc(r.content):'课表未提供具体课程内容。';
+  if(r.note)content+='　<span style="color:#c2410c">备注：'+esc(r.note)+'</span>';
+  let meta='';
+  if(r.location&&r.location!=='—')meta+='📍 '+esc(r.location);
+  if(r.teacher&&r.teacher!=='—')meta+=(meta?' · ':'')+'👨‍🏫 '+esc(r.teacher);
+  if(!meta)meta='📍 课表未提供地点 · 👨‍🏫 课表未提供教师';
+  let actions='';
+  if(r.source==='用户补充'){
+    actions='<button class="sm" onclick="openEdit(\''+r.id+'\')">修改</button><button class="sm danger" onclick="delAdd(\''+r.id+'\')">删除</button>';
+  }else if(r.status==='已取消'){
+    actions='<button class="sm" onclick="openEdit(\''+r.id+'\')">修改</button><button class="sm ok" onclick="restore(\''+r.id+'\')">恢复</button>';
+  }else if(r.status==='已修改'){
+    actions='<button class="sm" onclick="openEdit(\''+r.id+'\')">修改</button><button class="sm ok" onclick="restore(\''+r.id+'\')">恢复</button><button class="sm danger" onclick="cancelCourse(\''+r.id+'\')">取消</button>';
+  }else{
+    actions='<button class="sm" onclick="openEdit(\''+r.id+'\')">修改</button><button class="sm danger" onclick="cancelCourse(\''+r.id+'\')">取消</button>';
+  }
+  return '<div class="top"><span class="time-chip">'+esc(r.time||'时间待定')+'</span>'+(r.period?'<span class="period-chip">'+esc(r.period)+'</span>':'')+badges+'</div>'
+    +'<div class="course-name">'+name+'</div>'
+    +'<div class="meta">'+meta+'</div>'
+    +'<div class="content">📖 '+content+'</div>'
+    +'<div class="card-actions">'+actions+'</div>';
+}
+function dayStats(active,cancelled){
+  const starts=active.map(r=>{const tr=parseTimeRange(r.time);return tr?tr[0]:null;}).filter(v=>v!==null);
+  const ends=active.map(r=>{const tr=parseTimeRange(r.time);return tr?tr[1]:null;}).filter(v=>v!==null);
+  const fmtM=m=>String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');
+  const gaps=[];
+  if(starts.length>1){
+    const sorted=active.filter(r=>{const tr=parseTimeRange(r.time);return tr;}).sort((a,b)=>startMin(a)-startMin(b));
+    for(let i=0;i<sorted.length-1;i++){
+      const a=parseTimeRange(sorted[i].time),b=parseTimeRange(sorted[i+1].time);
+      if(b[0]-a[1]>=30)gaps.push([fmtM(a[1]),fmtM(b[0])]);
+    }
+  }
+  return {count:active.length,am:active.filter(r=>{const tr=parseTimeRange(r.time);return tr&&tr[0]<720;}).length,
+    pm:active.filter(r=>{const tr=parseTimeRange(r.time);return tr&&tr[0]>=720;}).length,
+    first:starts.length?fmtM(Math.min(...starts)):null,lastEnd:ends.length?fmtM(Math.max(...ends)):null,
+    cancelled:cancelled.length,gaps};
+}
+
+/* ---------- 渲染：整周 ---------- */
+function renderWeek(anchorDate){
+  state.selDate=anchorDate;
+  const mon=weekMonday(parseDateStr(anchorDate));
+  const weekIdx=Math.round((mon-W0_DATE)/86400000/7);
+  const recs=effectiveRecords();
+  let html='<div class="day-head">'
+    +'<button class="navbtn" onclick="weekNav(-1)">‹ 上一周</button>'
+    +'<div class="day-title">第'+weekIdx+'周（'+(mon.getMonth()+1)+'月'+mon.getDate()+'日 ~ '+(addDays(mon,6).getMonth()+1)+'月'+addDays(mon,6).getDate()+'日）</div>'
+    +'<button class="navbtn" onclick="weekNav(1)">下一周 ›</button></div>';
+  const todayStr=fmtDate(new Date());
+  for(let i=0;i<7;i++){
+    const d=addDays(mon,i),ds=fmtDate(d);
+    const list=recs.filter(r=>r.date===ds&&r.status!=='已取消');
+    const act=list.filter(isActive).sort((a,b)=>startMin(a)-startMin(b));
+    const can=list.filter(r=>r.status==='已取消');
+    const fre=list.filter(isFree);
+    const todayCls=ds===todayStr?' wd-today':'';
+    html+='<div class="week-day'+todayCls+'">'
+      +'<div class="wd-head" onclick="goDay(\''+ds+'\')"><span class="d">'+(i===0?'周一':'')+(i===1?'周二':'')+(i===2?'周三':'')+(i===3?'周四':'')+(i===4?'周五':'')+(i===5?'周六':'')+(i===6?'周日':'')+' · '+(d.getMonth()+1)+'月'+d.getDate()+'日</span>'
+      +'<span class="cnt">'+(act.length?act.length+' 节':'无课')+(can.length?' · 取消'+can.length:'')+'</span></div>'
+      +'<div class="wd-body">';
+    if(!act.length&&!can.length&&!fre.length)html+='<div class="wd-empty">无课</div>';
+    act.forEach(r=>{
+      html+='<div class="wd-item"><span class="t">'+esc(r.time||'')+'</span><span class="c">'+esc(r.course)+'</span>'
+        +(r.source==='用户补充'?'<span class="badge s-用户补充">补充</span>':'')
+        +(r.status==='已修改'?'<span class="badge s-已修改">改</span>':'')
+        +'</div>';
+    });
+    can.forEach(r=>{html+='<div class="wd-item"><span class="t">'+esc(r.time||'')+'</span><span class="c" style="text-decoration:line-through;color:#94a3b8">'+esc(r.course)+'</span><span class="badge s-已取消">取消</span></div>';});
+    fre.forEach(r=>{html+='<div class="wd-item"><span class="t">'+(r.time==='—'?'':esc(r.time))+'</span><span class="c" style="color:#94a3b8">可调课（无课）</span></div>';});
+    html+='</div></div>';
+  }
+  document.getElementById('main').innerHTML=html;
+  document.getElementById('resultInfo').textContent='🗓 第'+weekIdx+'周整周课表（点击某天可查看当日详情）';
+}
+function weekNav(n){
+  const mon=weekMonday(parseDateStr(state.selDate));
+  renderWeek(fmtDate(addDays(mon,n*7)));
+}
+
+/* ---------- 渲染：补充安排 ---------- */
+function renderAdd(){
+  const adds=mods.filter(m=>m.action==='add');
+  let html='<div class="day-title" style="font-size:16px;font-weight:700;margin-bottom:10px">＋ 补充安排 / 临时事件</div>';
+  html+='<div class="card">';
+  html+='<div class="field"><label>日期</label><input type="date" id="ad-date" value="'+state.selDate+'"></div>';
+  html+='<div class="field"><label>时间（如 15:00-16:00）</label><input type="text" id="ad-time" placeholder="15:00-16:00"></div>';
+  html+='<div class="field"><label>事项 / 课程</label><input type="text" id="ad-course" placeholder="如：班会 / 自习 / 实验"></div>';
+  html+='<div class="field"><label>类型</label><select id="ad-type"><option value="其他">其他</option><option value="理论课">理论课</option><option value="见习">见习</option><option value="CBL">CBL</option><option value="讨论课">讨论课</option><option value="班会">班会</option><option value="自习">自习</option></select></div>';
+  html+='<div class="field"><label>地点</label><input type="text" id="ad-loc" placeholder="课表未提供"></div>';
+  html+='<div class="field"><label>老师 / 组织者</label><input type="text" id="ad-teacher" placeholder="课表未提供"></div>';
+  html+='<div class="field"><label>内容 / 备注</label><input type="text" id="ad-content" placeholder="课表未提供"></div>';
+  html+='<div class="card-actions"><button class="primary" onclick="submitAdd()">添加安排</button></div>';
+  html+='</div>';
+  if(adds.length){
+    html+='<div class="day-title" style="font-size:15px;font-weight:700;margin:14px 0 8px">已补充事件</div>';
+    adds.forEach(m=>{
+      const f=m.fields;
+      const dd=parseDateStr(f.date);
+      html+='<div class="card"><div class="top"><span class="time-chip">'+(dd.getMonth()+1)+'月'+dd.getDate()+'日 '+esc(f.time||'')+'</span><span class="badge s-用户补充">用户补充</span></div>'
+        +'<div class="course-name">'+esc(f.course||'（未命名事项）')+'</div>'
+        +'<div class="meta">📍 '+esc(f.location||'课表未提供')+(f.teacher?' · 👨‍🏫 '+esc(f.teacher):'')+'</div>'
+        +'<div class="content">📖 '+esc(f.content||'课表未提供')+'</div>'
+        +'<div class="card-actions"><button class="sm danger" onclick="delAdd(\''+m.mid+'\')">删除</button></div></div>';
+    });
+  }else{
+    html+='<div class="card"><div class="course-name" style="color:#94a3b8;font-size:14px">还没有补充事件。可以通过“添加安排”加入班会、自习、实验等临时事项。</div></div>';
+  }
+  document.getElementById('main').innerHTML=html;
+  document.getElementById('resultInfo').textContent='🖊 添加临时安排会自动标记为【用户补充】，与学校原始课表区分。';
+}
+
+/* ---------- 渲染：本周统计 ---------- */
+function renderStats(){
+  const mon=weekMonday(parseDateStr(state.selDate));
+  const weekIdx=Math.round((mon-W0_DATE)/86400000/7);
+  const recs=effectiveRecords();
+  const weekRecs=recs.filter(r=>{const d=parseDateStr(r.date);return d>=mon&&d<addDays(mon,7);});
+  const act=weekRecs.filter(isActive);
+  const starts=act.map(r=>parseTimeRange(r.time)).filter(v=>v).map(v=>v[0]);
+  const fmtM=m=>String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');
+  let byDay=[];
+  for(let i=0;i<7;i++){const ds=fmtDate(addDays(mon,i));byDay.push(act.filter(r=>r.date===ds).length);}
+  const maxDay=Math.max(...byDay),maxIdx=byDay.indexOf(maxDay);
+  const gapsPerDay=[];
+  for(let i=0;i<7;i++){
+    const ds=fmtDate(addDays(mon,i));
+    const dayAct=act.filter(r=>r.date===ds).sort((a,b)=>startMin(a)-startMin(b));
+    let g=0;
+    for(let j=0;j<dayAct.length-1;j++){const a=parseTimeRange(dayAct[j].time),b=parseTimeRange(dayAct[j+1].time);if(b[0]-a[1]>=60)g++;}
+    gapsPerDay.push(g);
+  }
+  const freeMax=Math.max(...gapsPerDay),freeIdx=gapsPerDay.indexOf(freeMax);
+  const names=['周一','周二','周三','周四','周五','周六','周日'];
+  const counts={};
+  act.forEach(r=>{counts[r.course]=(counts[r.course]||0)+1;});
+  const top=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  let html='<div class="day-title" style="font-size:16px;font-weight:700;margin-bottom:10px">📊 第'+weekIdx+'周统计（'+(mon.getMonth()+1)+'月'+mon.getDate()+'日 起）</div>';
+  html+='<div class="stats-grid">'
+    +'<div class="stat-box"><div class="k">本周总课数</div><div class="v">'+act.length+' 节</div></div>'
+    +'<div class="stat-box"><div class="k">最早上课</div><div class="v">'+(starts.length?fmtM(Math.min(...starts)):'无')+'</div></div>'
+    +'<div class="stat-box"><div class="k">课最多的一天</div><div class="v">'+names[maxIdx]+' · '+maxDay+' 节</div></div>'
+    +'<div class="stat-box"><div class="k">空闲最多的一天</div><div class="v">'+names[freeIdx]+'（'+(freeMax===0?'基本无整段空闲':'空余≥1小时 '+freeMax+' 段')+'）</div></div>'
+    +'</div>';
+  html+='<div style="margin:12px 0 6px;font-weight:700;font-size:14px">各天课数</div>';
+  byDay.forEach((n,i)=>{
+    html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px"><span style="width:44px;font-size:13px">'+names[i]+'</span>'
+      +'<div style="flex:1;background:#eef2f7;border-radius:6px;height:16px;overflow:hidden"><div style="width:'+(maxDay?n/maxDay*100:0)+'%;background:#2f6fed;height:100%;border-radius:6px"></div></div>'
+      +'<span style="width:30px;font-size:13px;color:#475569;text-align:right">'+n+'</span></div>';
+  });
+  html+='<div style="margin:12px 0 6px;font-weight:700;font-size:14px">课程分布（本周）</div>';
+  if(top.length){
+    html+='<div class="stats-grid">';
+    top.forEach(([c,n])=>html+='<div class="stat-box"><div class="k">'+esc(c)+'</div><div class="v">'+n+' 节</div></div>');
+    html+='</div>';
+  }else{
+    html+='<div class="card"><div class="course-name" style="color:#94a3b8;font-size:14px">本周无课程安排。</div></div>';
+  }
+  html+='<div style="margin:12px 0 6px;font-weight:700;font-size:14px">全学期概览</div>';
+  const allAct=recs.filter(isActive);
+  const allCounts={};
+  allAct.forEach(r=>{allCounts[r.course]=(allCounts[r.course]||0)+1;});
+  const allTop=Object.entries(allCounts).sort((a,b)=>b[1]-a[1]);
+  let semesterHtml='<div class="stats-grid">';
+  semesterHtml+='<div class="stat-box"><div class="k">学期课程总节数</div><div class="v">'+allAct.length+' 节</div></div>';
+  const theory=allAct.filter(r=>r.type==='理论课').length;
+  semesterHtml+='<div class="stat-box"><div class="k">理论课</div><div class="v">'+theory+' 节</div></div>';
+  semesterHtml+='<div class="stat-box"><div class="k">实践课（见习/CBL/PBL等）</div><div class="v">'+(allAct.length-theory)+' 节</div></div>';
+  semesterHtml+='<div class="stat-box"><div class="k">涉及课程门数</div><div class="v">'+allTop.length+' 门</div></div>';
+  semesterHtml+='</div>';
+  html+=semesterHtml;
+  html+='<div style="margin:12px 0 6px;font-weight:700;font-size:14px">各课程节数（全学期）</div>';
+  let listHtml='';
+  allTop.forEach(([c,n],i)=>{if(i<12)listHtml+='<div style="font-size:13px;padding:3px 0;border-bottom:1px dashed #eef2f7;display:flex;justify-content:space-between"><span>'+esc(c)+'</span><span style="color:#64748b">'+n+' 节</span></div>';});
+  if(!listHtml)listHtml='<div style="color:#94a3b8;font-size:13px">暂无数据</div>';
+  html+=listHtml;
+  document.getElementById('main').innerHTML=html;
+  document.getElementById('resultInfo').textContent='📊 自动汇总本周与全学期数据（含您的修改）。';
+}
+
+/* ---------- 操作：修改/取消/恢复/删除/添加 ---------- */
+function cancelCourse(id){
+  const r=effectiveRecords().find(x=>x.id===id);
+  if(!r)return;
+  if(confirm('确认取消这节课？\n'+r.date+' '+r.time+' '+r.course)){
+    mods.push({action:'cancel',targetId:id,note:'用户补充信息'});
+    saveMods();refresh();
+  }
+}
+function restore(id){
+  mods.push({action:'restore',targetId:id});
+  saveMods();refresh();
+}
+function delAdd(mid){
+  mods=mods.filter(m=>m.mid!==mid);
+  saveMods();refresh();
+}
+function openEdit(id){
+  const r=effectiveRecords().find(x=>x.id===id);
+  if(!r)return;
+  const isAdd=r.source==='用户补充';
+  const box=document.getElementById('modalBox');
+  box.innerHTML='<div class="modal-title">'+(isAdd?'修改补充事件':'修改课程')+'</div>'
+    +'<div class="field"><label>日期</label><input type="date" id="ed-date" value="'+r.date+'"></div>'
+    +'<div class="field"><label>时间</label><input type="text" id="ed-time" value="'+esc(r.time||'')+'" placeholder="如 08:00-09:40"></div>'
+    +'<div class="field"><label>节次/时段</label><input type="text" id="ed-period" value="'+esc(r.period||'')+'"></div>'
+    +'<div class="field"><label>课程 / 事项</label><input type="text" id="ed-course" value="'+esc(r.course||'')+'"></div>'
+    +'<div class="field"><label>类型</label><input type="text" id="ed-type" value="'+esc(r.type||'')+'"></div>'
+    +'<div class="field"><label>地点</label><input type="text" id="ed-loc" value="'+esc(r.location||'')+'"></div>'
+    +'<div class="field"><label>教师</label><input type="text" id="ed-teacher" value="'+esc(r.teacher||'')+'"></div>'
+    +'<div class="field"><label>内容 / 备注</label><input type="text" id="ed-content" value="'+esc(r.content||'')+'"></div>'
+    +'<div class="modal-actions"><button onclick="closeModal()">取消</button><button class="primary" onclick="submitEdit(\''+id+'\')">保存修改</button></div>';
+  document.getElementById('modal').classList.add('open');
+}
+function submitEdit(id){
+  const fields={
+    date:document.getElementById('ed-date').value,
+    time:document.getElementById('ed-time').value.trim(),
+    period:document.getElementById('ed-period').value.trim(),
+    course:document.getElementById('ed-course').value.trim(),
+    type:document.getElementById('ed-type').value.trim(),
+    location:document.getElementById('ed-loc').value.trim(),
+    teacher:document.getElementById('ed-teacher').value.trim(),
+    content:document.getElementById('ed-content').value.trim()
+  };
+  if(!fields.date){alert('请选择日期');return;}
+  if(!fields.time){alert('请填写时间');return;}
+  if(!fields.course){alert('请填写课程/事项名称');return;}
+  const tr=parseTimeRange(fields.time);
+  if(!tr){alert('时间格式应为：08:00-09:40');return;}
+  const old=effectiveRecords().find(x=>x.id===id);
+  const conflicts=findConflicts(fields.date,fields.time,fields.time,old&&old.date===fields.date?[id]:[id]);
+  const doSave=()=>{
+    mods=mods.filter(m=>m.mid!==id&&m.targetId!==id);
+    if(old&&old.source==='用户补充'){mods.push({action:'add',mid:id,fields:Object.assign({},old,fields)});}
+    else{mods.push({action:'edit',targetId:id,fields,note:'用户修改'});}
+    saveMods();closeModal();refresh();
+  };
+  if(conflicts.length){
+    const box=document.getElementById('modalBox');
+    const list=conflicts.map(c=>'<div>'+esc(c.time)+' '+esc(c.course)+'（'+esc(c.location||'地点未提供')+'）</div>').join('');
+    box.insertAdjacentHTML('beforeend','<div class="conflict-box">⚠️ 发现时间冲突：'+list+'<div style="margin-top:8px;display:flex;gap:6px;justify-content:flex-end"><button onclick="closeModal()">放弃修改</button><button class="primary" onclick="forceEdit(\''+id+'\')">仍然保存</button></div></div>');
+    window.__forceEditId=id;
+    return;
+  }
+  doSave();
+}
+function forceEdit(id){
+  const fields={
+    date:document.getElementById('ed-date').value,
+    time:document.getElementById('ed-time').value.trim(),
+    period:document.getElementById('ed-period').value.trim(),
+    course:document.getElementById('ed-course').value.trim(),
+    type:document.getElementById('ed-type').value.trim(),
+    location:document.getElementById('ed-loc').value.trim(),
+    teacher:document.getElementById('ed-teacher').value.trim(),
+    content:document.getElementById('ed-content').value.trim()
+  };
+  const old=effectiveRecords().find(x=>x.id===id);
+  mods=mods.filter(m=>m.mid!==id&&m.targetId!==id);
+  if(old&&old.source==='用户补充'){mods.push({action:'add',mid:id,fields:Object.assign({},old,fields)});}
+  else{mods.push({action:'edit',targetId:id,fields,note:'用户修改'});}
+  saveMods();closeModal();refresh();
+}
+function submitAdd(){
+  const fields={
+    date:document.getElementById('ad-date').value,
+    time:document.getElementById('ad-time').value.trim(),
+    period:'',
+    course:document.getElementById('ad-course').value.trim(),
+    type:document.getElementById('ad-type').value,
+    location:document.getElementById('ad-loc').value.trim(),
+    teacher:document.getElementById('ad-teacher').value.trim(),
+    content:document.getElementById('ad-content').value.trim()
+  };
+  if(!fields.date){alert('请选择日期');return;}
+  if(!fields.time){alert('请填写时间，如 15:00-16:00');return;}
+  if(!fields.course){alert('请填写事项名称');return;}
+  const tr=parseTimeRange(fields.time);
+  if(!tr){alert('时间格式应为：15:00-16:00');return;}
+  const conflicts=findConflicts(fields.date,fields.time,fields.time,[]);
+  const doSave=()=>{
+    const mid='a'+Date.now();
+    mods.push({action:'add',mid,fields});
+    saveMods();state.selDate=fields.date;refresh();
+  };
+  if(conflicts.length){
+    if(confirm('⚠️ 发现时间冲突：\n'+conflicts.map(c=>c.time+' '+c.course).join('\n')+'\n\n仍然添加吗？')){
+      doSave();
+    }
+    return;
+  }
+  doSave();
+}
+function closeModal(){document.getElementById('modal').classList.remove('open');}
+
+/* ---------- 导航 ---------- */
+function dayNav(n){renderDay(fmtDate(addDays(parseDateStr(state.selDate),n)),state.part,state.keyword,false);}
+function goDay(ds){renderDay(ds,null,null,false);document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab==='day'));}
+function switchTab(name){
+  state.tab=name;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===name));
+  if(name==='day')renderDay(state.selDate,state.part,state.keyword,state.highlightFirst);
+  else if(name==='week')renderWeek(state.selDate);
+  else if(name==='add')renderAdd();
+  else if(name==='stats')renderStats();
+}
+function refresh(){switchTab(state.tab);}
+
+/* ---------- 事件绑定 ---------- */
+document.getElementById('qBtn').onclick=()=>{
+  const res=resolveQuery(document.getElementById('q').value);
+  state.weekMode=false;
+  if(res.dates&&res.dates.length===1){
+    renderDay(res.dates[0],res.part,res.keyword,res.highlightFirst);
+  }else if(res.dates&&res.dates.length>1){
+    // 多日期：渲染这些日期的课程列表
+    renderMulti(res.dates,res.part,res.keyword);
+  }else if(res.weekMode){
+    renderWeek(state.selDate);
+  }else if(res.keyword){
+    searchAll(res.keyword);
+  }else{
+    renderDay(state.selDate,null,null,false);
+  }
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab==='day'));
+};
+document.getElementById('q').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('qBtn').click();});
+document.getElementById('btnToday').onclick=()=>{renderDay(fmtDate(new Date()),null,null,false);};
+document.getElementById('btnTomorrow').onclick=()=>{renderDay(fmtDate(addDays(new Date(),1)),null,null,false);};
+document.getElementById('btnWeek').onclick=()=>{renderWeek(fmtDate(new Date()));switchTab('week');};
+document.getElementById('dateInput').onchange=e=>{if(e.target.value)renderDay(e.target.value,null,null,false);};
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>switchTab(t.dataset.tab));
+document.getElementById('modal').onclick=e=>{if(e.target.id==='modal')closeModal();};
+
+/* ---------- 多日期 / 全局搜索 ---------- */
+function renderMulti(dates,part,keyword){
+  state.selDate=dates[0];
+  const recs=effectiveRecords();
+  const ds=new Set(dates);
+  let list=recs.filter(r=>ds.has(r.date)&&r.status!=='已取消'&&isActive(r));
+  if(part==='am')list=list.filter(r=>{const tr=parseTimeRange(r.time);return tr&&tr[0]<720;});
+  if(part==='pm')list=list.filter(r=>{const tr=parseTimeRange(r.time);return tr&&tr[0]>=720;});
+  if(keyword)list=list.filter(r=>[r.course,r.location,r.teacher,r.content,r.type].join(' ').includes(keyword));
+  list.sort((a,b)=>a.date.localeCompare(b.date)||startMin(a)-startMin(b));
+  let html='<div class="day-title" style="font-size:16px;font-weight:700;margin-bottom:10px">查询结果：共 '+list.length+' 节</div>';
+  let cur='';
+  list.forEach(r=>{
+    if(r.date!==cur){
+      cur=r.date;
+      html+='<div style="font-weight:700;font-size:14px;margin:10px 0 6px">'+fmtCn(parseDateStr(cur))+'</div>';
+    }
+    html+='<div class="card">'+renderCard(r)+'</div>';
+  });
+  if(!list.length)html+='<div class="card"><div class="course-name" style="color:#94a3b8;font-size:14px">没有符合条件的课程。</div></div>';
+  document.getElementById('main').innerHTML=html;
+  document.getElementById('resultInfo').textContent='🔍 共找到 '+list.length+' 节课程。';
+}
+function searchAll(keyword){
+  const recs=effectiveRecords();
+  let list=recs.filter(r=>r.status!=='已取消'&&isActive(r)&&[r.course,r.location,r.teacher,r.content,r.type].join(' ').includes(keyword));
+  list.sort((a,b)=>a.date.localeCompare(b.date)||startMin(a)-startMin(b));
+  let html='<div class="day-title" style="font-size:16px;font-weight:700;margin-bottom:10px">搜索「'+esc(keyword)+'」：全学期共 '+list.length+' 节</div>';
+  let cur='';
+  list.forEach(r=>{
+    if(r.date!==cur){cur=r.date;html+='<div style="font-weight:700;font-size:14px;margin:10px 0 6px">'+fmtCn(parseDateStr(cur))+'</div>';}
+    html+='<div class="card">'+renderCard(r)+'</div>';
+  });
+  if(!list.length)html+='<div class="card"><div class="course-name" style="color:#94a3b8;font-size:14px">没有符合条件的课程。</div></div>';
+  document.getElementById('main').innerHTML=html;
+  document.getElementById('resultInfo').textContent='🔍 搜索「'+keyword+'」：共 '+list.length+' 节。';
+}
+
+/* ---------- 初始化 ---------- */
+renderDay(state.selDate,null,null,false);
+</script>
+</body>
+</html>
